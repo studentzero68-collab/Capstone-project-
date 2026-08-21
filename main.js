@@ -618,8 +618,13 @@ function openDetail(listing) {
   $('book-checkin').value = '';
   $('book-checkout').value = '';
 
-  updateBookingBreakdown();
-  navigateTo('detail');
+  // Sync save button state on open
+  const savedBtn = $('btn-save-listing');
+  if (savedBtn) {
+    const isSaved = state.wishlist.includes(listing.id);
+    savedBtn.textContent = isSaved ? '❤️ Saved to Wishlist' : '🤍 Save to Wishlist';
+    savedBtn.classList.toggle('saved', isSaved);
+  }
 }
 
 function updateBookingBreakdown() {
@@ -964,6 +969,24 @@ function initBookingCard() {
     });
     localStorage.setItem('zero_bookings', JSON.stringify(bookings));
     showToast(`🎉 Reservation confirmed for ${nights} night${nights > 1 ? 's' : ''} at ${listing.title}!`, 'var(--green)');
+  });
+
+  // Save to wishlist from detail page
+  $('btn-save-listing').addEventListener('click', () => {
+    if (!state.currentListing) return;
+    const id  = state.currentListing.id;
+    const btn = $('btn-save-listing');
+    const idx = state.wishlist.indexOf(id);
+    if (idx === -1) {
+      state.wishlist.push(id);
+      btn.textContent = '❤️ Saved to Wishlist';
+      btn.classList.add('saved');
+    } else {
+      state.wishlist.splice(idx, 1);
+      btn.textContent = '🤍 Save to Wishlist';
+      btn.classList.remove('saved');
+    }
+    localStorage.setItem('zero_wishlist', JSON.stringify(state.wishlist));
   });
 
   // Back button

@@ -1014,3 +1014,30 @@ mark {
   .detail-title { color: #000; }
   .detail-description { color: #333; }
 }
+
+/* ===================== BOOKING CARD SAVE BUTTON ===================== */
+.btn-save-listing {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .4rem;
+  width: 100%;
+  background: transparent;
+  border: 1.5px solid rgba(123,45,139,.5);
+  color: var(--white-dim);
+  padding: .65rem;
+  border-radius: var(--radius-md);
+  font-family: var(--font-accent);
+  font-size: 1rem;
+  margin-top: .5rem;
+  transition: all var(--transition);
+}
+.btn-save-listing:hover {
+  border-color: var(--rose);
+  color: var(--rose);
+}
+.btn-save-listing.saved {
+  border-color: var(--rose);
+  color: var(--rose);
+  background: rgba(233,30,140,.08);
+}
