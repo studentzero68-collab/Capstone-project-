@@ -310,6 +310,7 @@ function navigateTo(page) {
   pages[page].classList.add('active');
   state.currentPage = page;
   window.scrollTo({ top: 0, behavior: 'smooth' });
+  syncPageTitle(page, page === 'search' ? state.searchQuery : page === 'detail' ? state.currentListing?.title : '');
 
   // Show/hide cat bar and footer
   const catBar = $('cat-bar');
@@ -1060,6 +1061,16 @@ function syncCatPills() {
     p.classList.toggle('active', isActive);
     p.setAttribute('aria-selected', String(isActive));
   });
+}
+
+/* ===================== PAGE TITLE SYNC ===================== */
+function syncPageTitle(page, extra) {
+  const titles = {
+    home:   'Zero — Where Every Journey Begins',
+    search: `Search Results${extra ? ` for "${extra}"` : ''} — Zero`,
+    detail: `${extra || 'Listing'} — Zero`
+  };
+  document.title = titles[page] || titles.home;
 }
 
 /* ===================== INIT ===================== */
