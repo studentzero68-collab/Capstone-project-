@@ -839,12 +839,32 @@ function initFilterPanel() {
     state.filterAmenities = [...$$('.amenity-cb:checked')].map(cb => cb.value);
     closePanel();
     state.homeListingsShown = 8;
+    updateFilterBadge();
     if (state.currentPage === 'home') {
       renderHomeListings();
     } else {
       renderSearchResults();
     }
   });
+}
+
+/* ===================== FILTER BADGE ===================== */
+function updateFilterBadge() {
+  const btn = $('filter-btn');
+  const activeCount = (state.filterPriceMin > 0 || state.filterPriceMax < 5000 ? 1 : 0)
+    + (state.filterBeds > 0 ? 1 : 0)
+    + state.filterTypes.length
+    + state.filterAmenities.length;
+
+  btn.classList.toggle('has-filters', activeCount > 0);
+  const existing = btn.querySelector('.filter-count-badge');
+  if (existing) existing.remove();
+  if (activeCount > 0) {
+    const badge = document.createElement('span');
+    badge.className = 'filter-count-badge';
+    badge.textContent = activeCount;
+    btn.appendChild(badge);
+  }
 }
 
 /* ===================== BOOKING CARD INTERACTIONS ===================== */

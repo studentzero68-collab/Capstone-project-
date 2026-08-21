@@ -897,3 +897,23 @@ input,select{font-family:var(--font-body)}
   transition: transform var(--transition), opacity var(--transition);
 }
 .back-to-top:hover { transform: translateY(-3px) scale(1.08); }
+
+/* ===================== ACTIVE FILTER INDICATOR ===================== */
+.filter-btn.has-filters {
+  background: rgba(230,126,34,.15);
+  border-color: var(--orange);
+  color: var(--orange);
+}
+.filter-count-badge {
+  background: var(--orange);
+  color: #fff;
+  font-size: .7rem;
+  font-weight: 700;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: .3rem;
+}
