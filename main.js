@@ -902,7 +902,22 @@ function initBookingCard() {
       return;
     }
     const nights = Math.round((new Date(checkout) - new Date(checkin)) / 86400000);
-    showToast(`🎉 Reservation confirmed for ${nights} night${nights > 1 ? 's' : ''} at ${state.currentListing.title}!`, 'var(--green)');
+    const listing = state.currentListing;
+    // Save to booking history
+    const bookings = JSON.parse(localStorage.getItem('zero_bookings') || '[]');
+    bookings.push({
+      id: listing.id,
+      title: listing.title,
+      location: listing.location,
+      checkin,
+      checkout,
+      nights,
+      guests: state.bookingGuests,
+      total: nights * listing.price + Math.round(nights * listing.price * 0.12),
+      bookedAt: new Date().toISOString()
+    });
+    localStorage.setItem('zero_bookings', JSON.stringify(bookings));
+    showToast(`🎉 Reservation confirmed for ${nights} night${nights > 1 ? 's' : ''} at ${listing.title}!`, 'var(--green)');
   });
 
   // Back button
