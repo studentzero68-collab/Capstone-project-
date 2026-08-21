@@ -1159,6 +1159,21 @@ function init() {
   initSearchBar();
   initSort();
   initCultureTabs();
+  // Culture banner cards also trigger tab filter
+  $$('.culture-banner-card').forEach(card => {
+    const activate = () => {
+      const culture = card.dataset.culture;
+      $$('.culture-tab').forEach(t => {
+        t.classList.toggle('active', t.dataset.culture === culture);
+        t.setAttribute('aria-selected', t.dataset.culture === culture ? 'true' : 'false');
+      });
+      state.activeCulture = culture;
+      renderCultureGrid();
+      document.getElementById('culture-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+    card.addEventListener('click', activate);
+    card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') activate(); });
+  });
   initJourneyCards();
   initFilterPanel();
   initBookingCard();
