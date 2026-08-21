@@ -425,16 +425,21 @@ function sortListings(arr) {
 
 function renderHomeListings() {
   const grid = $('home-listings-grid');
-  grid.innerHTML = '';
-  const filtered = sortListings(getFilteredListings());
-  const shown = filtered.slice(0, state.homeListingsShown);
-  if (shown.length === 0) {
-    grid.innerHTML = '<p class="no-results">No stays match your filters. Try adjusting them.</p>';
-  } else {
-    shown.forEach(l => grid.appendChild(buildCard(l)));
-  }
-  $('btn-load-more').style.display = filtered.length > state.homeListingsShown ? '' : 'none';
-  initReveal();
+  grid.innerHTML = '<div class="spinner-wrap"><div class="spinner" aria-label="Loading listings"></div></div>';
+
+  // Simulate brief loading delay for UX
+  setTimeout(() => {
+    grid.innerHTML = '';
+    const filtered = sortListings(getFilteredListings());
+    const shown = filtered.slice(0, state.homeListingsShown);
+    if (shown.length === 0) {
+      grid.innerHTML = '<p class="no-results">No stays match your filters. Try adjusting them.</p>';
+    } else {
+      shown.forEach(l => grid.appendChild(buildCard(l)));
+    }
+    $('btn-load-more').style.display = filtered.length > state.homeListingsShown ? '' : 'none';
+    initReveal();
+  }, 300);
 }
 
 function renderCultureGrid() {
