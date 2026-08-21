@@ -1010,6 +1010,49 @@ function initKeyboardNav() {
   });
 }
 
+/* ===================== GUESTS POPOVER ===================== */
+function initGuestsPopover() {
+  const display  = $('nsb-guests-display');
+  const popover  = $('guests-popover');
+  let adults = 1, children = 0, infants = 0;
+
+  function updateDisplay() {
+    const total = adults + children;
+    const parts = [`${total} guest${total !== 1 ? 's' : ''}`];
+    if (infants > 0) parts.push(`${infants} infant${infants !== 1 ? 's' : ''}`);
+    display.textContent = parts.join(', ');
+    state.guests = total;
+  }
+
+  function makeStepper(minusId, plusId, getter, setter, min, max) {
+    $(minusId).addEventListener('click', e => {
+      e.stopPropagation();
+      if (getter() > min) { setter(getter() - 1); $(plusId.replace('plus','count').replace('minus','count')); updateDisplay(); }
+      const countId = minusId.replace('minus','count');
+      $(countId).textContent = getter();
+      updateDisplay();
+    });
+    $(plusId).addEventListener('click', e => {
+      e.stopPropagation();
+      if (getter() < max) { setter(getter() + 1); }
+      const countId = plusId.replace('plus','count');
+      $(countId).textContent = getter();
+      updateDisplay();
+    });
+  }
+
+  makeStepper('gp-adult-minus','gp-adult-plus', ()=>adults, v=>{adults=v;}, 1, 16);
+  makeStepper('gp-child-minus','gp-child-plus', ()=>children, v=>{children=v;}, 0, 10);
+  makeStepper('gp-infant-minus','gp-infant-plus', ()=>infants, v=>{infants=v;}, 0, 5);
+
+  display.addEventListener('click', e => {
+    e.stopPropagation();
+    popover.classList.toggle('hidden');
+  });
+  document.addEventListener('click', () => popover.classList.add('hidden'));
+  popover.addEventListener('click', e => e.stopPropagation());
+}
+
 /* ===================== ACTIVE CAT PILL SYNC ===================== */
 function syncCatPills() {
   $$('.cat-pill').forEach(p => {
@@ -1026,6 +1069,7 @@ function init() {
   renderCultureGrid();
 
   // Wire up all interactions
+  initGuestsPopover();
   initCatBar();
   initSearchBar();
   initSort();
