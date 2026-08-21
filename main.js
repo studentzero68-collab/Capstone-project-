@@ -6,6 +6,10 @@
 'use strict';
 
 /* ===================== DATA ===================== */
+/* ===================== LISTINGS DATA ===================== */
+// 18 unique properties across 9 categories:
+// treehouse (2), beach (2), garage (2), baker (2),
+// musician (2), gamer (2), japanese (2), korean (2), southafrican (2)
 const LISTINGS = [
   /* ---- TREEHOUSES ---- */
   {
