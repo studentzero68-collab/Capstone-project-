@@ -358,7 +358,7 @@ function buildCard(listing) {
         <span style="color:var(--white-dim);font-size:.82rem">(${listing.reviews})</span>
       </div>
       <div class="card-price-row">
-        <span class="card-price">R${listing.price.toLocaleString()}</span>
+        <span class="card-price">${formatPrice(listing.price)}</span>
         <span class="card-per">/ night</span>
       </div>
     </div>`;
