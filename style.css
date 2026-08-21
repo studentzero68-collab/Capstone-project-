@@ -875,3 +875,25 @@ input,select{font-family:var(--font-body)}
   animation: spin .8s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
+
+/* ===================== BACK TO TOP ===================== */
+.back-to-top {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  background: var(--gradient-sunset);
+  color: #fff;
+  border: none;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(230,126,34,.4);
+  z-index: 150;
+  cursor: pointer;
+  transition: transform var(--transition), opacity var(--transition);
+}
+.back-to-top:hover { transform: translateY(-3px) scale(1.08); }

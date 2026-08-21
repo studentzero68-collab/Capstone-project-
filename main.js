@@ -1016,6 +1016,15 @@ function initKeyboardNav() {
   });
 }
 
+/* ===================== BACK TO TOP ===================== */
+function initBackToTop() {
+  const btn = $('back-to-top');
+  window.addEventListener('scroll', () => {
+    btn.classList.toggle('hidden', window.scrollY < 400);
+  }, { passive: true });
+  btn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+}
+
 /* ===================== GUESTS POPOVER ===================== */
 function initGuestsPopover() {
   const display  = $('nsb-guests-display');
@@ -1085,6 +1094,7 @@ function init() {
   renderCultureGrid();
 
   // Wire up all interactions
+  initBackToTop();
   initGuestsPopover();
   initCatBar();
   initSearchBar();
