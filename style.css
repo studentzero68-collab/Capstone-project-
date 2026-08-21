@@ -818,3 +818,27 @@ input,select{font-family:var(--font-body)}
 @media (hover: none) {
   .listing-card .card-img-wrap img { transform: none !important; }
 }
+
+/* ===================== GUESTS POPOVER ===================== */
+.guests-popover {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: var(--black-card);
+  border: 1px solid rgba(123,45,139,.4);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem 1.5rem;
+  min-width: 300px;
+  box-shadow: 0 16px 40px rgba(0,0,0,.6);
+  z-index: 300;
+}
+.gp-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: .75rem 0;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+}
+.gp-row:last-child { border-bottom: none; }
+.gp-label { font-weight: 600; font-size: .92rem; }
+.gp-sub   { font-family: var(--font-accent); font-size: .82rem; color: var(--white-dim); }
