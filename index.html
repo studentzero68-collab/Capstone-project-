@@ -477,6 +477,43 @@
     </div>
   </div>
 
+  <!-- ===================== GUESTS POPOVER ===================== -->
+  <div id="guests-popover" class="guests-popover hidden" role="dialog" aria-label="Select number of guests">
+    <div class="gp-row">
+      <div>
+        <p class="gp-label">Adults</p>
+        <p class="gp-sub">Age 13+</p>
+      </div>
+      <div class="guest-stepper">
+        <button class="stepper-btn" id="gp-adult-minus" aria-label="Decrease adults">&#8722;</button>
+        <span id="gp-adult-count" class="guest-count">1</span>
+        <button class="stepper-btn" id="gp-adult-plus" aria-label="Increase adults">&#43;</button>
+      </div>
+    </div>
+    <div class="gp-row">
+      <div>
+        <p class="gp-label">Children</p>
+        <p class="gp-sub">Ages 2–12</p>
+      </div>
+      <div class="guest-stepper">
+        <button class="stepper-btn" id="gp-child-minus" aria-label="Decrease children">&#8722;</button>
+        <span id="gp-child-count" class="guest-count">0</span>
+        <button class="stepper-btn" id="gp-child-plus" aria-label="Increase children">&#43;</button>
+      </div>
+    </div>
+    <div class="gp-row">
+      <div>
+        <p class="gp-label">Infants</p>
+        <p class="gp-sub">Under 2</p>
+      </div>
+      <div class="guest-stepper">
+        <button class="stepper-btn" id="gp-infant-minus" aria-label="Decrease infants">&#8722;</button>
+        <span id="gp-infant-count" class="guest-count">0</span>
+        <button class="stepper-btn" id="gp-infant-plus" aria-label="Increase infants">&#43;</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ===================== RESERVE TOAST ===================== -->
   <div id="reserve-toast" class="reserve-toast hidden" role="alert" aria-live="assertive">
     <span id="reserve-toast-msg"></span>
