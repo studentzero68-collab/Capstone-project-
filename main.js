@@ -345,8 +345,8 @@ function buildCard(listing) {
       </button>
     </div>
     <div class="card-body">
-      <h3 class="card-title">${listing.title}</h3>
-      <p class="card-location">📍 ${listing.location}</p>
+      <h3 class="card-title">${highlightMatch(listing.title, state.searchQuery)}</h3>
+      <p class="card-location">📍 ${highlightMatch(listing.location, state.searchQuery)}</p>
       <div class="card-meta">
         <span>${listing.guests} guests</span>
         <span>${listing.beds} bed${listing.beds > 1 ? 's' : ''}</span>
