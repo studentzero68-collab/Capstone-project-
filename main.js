@@ -457,7 +457,13 @@ function renderCultureGrid() {
   initReveal();
 }
 
-/* ===================== SEARCH RESULTS ===================== */
+/* ===================== SEARCH HIGHLIGHT ===================== */
+function highlightMatch(text, query) {
+  if (!query) return text;
+  const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return text.replace(new RegExp(`(${escaped})`, 'gi'), '<mark>$1</mark>');
+}
+
 function renderSearchResults() {
   const grid = $('search-listings-grid');
   grid.innerHTML = '';

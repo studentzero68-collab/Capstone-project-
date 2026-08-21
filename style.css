@@ -935,3 +935,11 @@ input,select{font-family:var(--font-body)}
   .nav-search-bar { display: none; width: 100%; }
   .nav-search-bar.open { display: flex; order: 10; min-width: unset; }
 }
+
+/* ===================== SEARCH HIGHLIGHT ===================== */
+mark {
+  background: rgba(230,126,34,.35);
+  color: var(--white);
+  border-radius: 2px;
+  padding: 0 2px;
+}
