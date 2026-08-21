@@ -1010,6 +1010,15 @@ function initKeyboardNav() {
   });
 }
 
+/* ===================== ACTIVE CAT PILL SYNC ===================== */
+function syncCatPills() {
+  $$('.cat-pill').forEach(p => {
+    const isActive = p.dataset.category === state.activeCategory;
+    p.classList.toggle('active', isActive);
+    p.setAttribute('aria-selected', String(isActive));
+  });
+}
+
 /* ===================== INIT ===================== */
 function init() {
   // Render home grids first
