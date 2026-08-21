@@ -458,6 +458,15 @@ function renderCultureGrid() {
   initReveal();
 }
 
+/* ===================== DEBOUNCE ===================== */
+function debounce(fn, delay) {
+  let timer;
+  return (...args) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => fn(...args), delay);
+  };
+}
+
 /* ===================== PRICE FORMATTER ===================== */
 function formatPrice(n) {
   return `R${Number(n).toLocaleString('en-ZA')}`;
@@ -738,6 +747,17 @@ function initSearchBar() {
 
   btn.addEventListener('click', doSearch);
   input.addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
+  input.addEventListener('input', debounce(() => {
+    // Live preview count in placeholder area
+    const q = input.value.trim().toLowerCase();
+    if (!q) return;
+    const count = LISTINGS.filter(l =>
+      l.title.toLowerCase().includes(q) ||
+      l.location.toLowerCase().includes(q) ||
+      l.category.toLowerCase().includes(q)
+    ).length;
+    input.setAttribute('aria-description', `${count} result${count !== 1 ? 's' : ''} found`);
+  }, 300));
 
   // Guests display (simple toggle)
   $('nsb-guests-display').addEventListener('click', () => {
