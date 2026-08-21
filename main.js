@@ -457,7 +457,11 @@ function renderCultureGrid() {
   initReveal();
 }
 
-/* ===================== SEARCH HIGHLIGHT ===================== */
+/* ===================== PRICE FORMATTER ===================== */
+function formatPrice(n) {
+  return `R${Number(n).toLocaleString('en-ZA')}`;
+}
+
 function highlightMatch(text, query) {
   if (!query) return text;
   const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
