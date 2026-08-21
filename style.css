@@ -917,3 +917,21 @@ input,select{font-family:var(--font-body)}
   justify-content: center;
   margin-left: .3rem;
 }
+
+/* ===================== MOBILE NAV SEARCH TOGGLE ===================== */
+.nav-search-toggle {
+  display: none;
+  background: var(--black-card);
+  border: 1.5px solid rgba(123,45,139,.4);
+  color: var(--white);
+  padding: .5rem 1rem;
+  border-radius: var(--radius-xl);
+  font-size: .9rem;
+  align-items: center;
+  gap: .4rem;
+}
+@media (max-width: 768px) {
+  .nav-search-toggle { display: flex; }
+  .nav-search-bar { display: none; width: 100%; }
+  .nav-search-bar.open { display: flex; order: 10; min-width: unset; }
+}

@@ -1052,6 +1052,18 @@ function initKeyboardNav() {
   });
 }
 
+/* ===================== MOBILE SEARCH TOGGLE ===================== */
+function initMobileSearchToggle() {
+  const toggle  = $('nav-search-toggle');
+  const bar     = document.querySelector('.nav-search-bar');
+  if (!toggle || !bar) return;
+  toggle.addEventListener('click', () => {
+    const isOpen = bar.classList.toggle('open');
+    toggle.setAttribute('aria-expanded', String(isOpen));
+    if (isOpen) $('nsb-where-input').focus();
+  });
+}
+
 /* ===================== BACK TO TOP ===================== */
 function initBackToTop() {
   const btn = $('back-to-top');
@@ -1130,6 +1142,7 @@ function init() {
   renderCultureGrid();
 
   // Wire up all interactions
+  initMobileSearchToggle();
   initBackToTop();
   initGuestsPopover();
   initCatBar();
