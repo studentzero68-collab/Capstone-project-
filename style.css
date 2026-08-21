@@ -842,3 +842,18 @@ input,select{font-family:var(--font-body)}
 .gp-row:last-child { border-bottom: none; }
 .gp-label { font-weight: 600; font-size: .92rem; }
 .gp-sub   { font-family: var(--font-accent); font-size: .82rem; color: var(--white-dim); }
+
+/* ===================== SKIP TO CONTENT LINK ===================== */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 1rem;
+  background: var(--orange);
+  color: #fff;
+  padding: .5rem 1rem;
+  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+  font-weight: 600;
+  z-index: 9999;
+  transition: top .2s;
+}
+.skip-link:focus { top: 0; }
