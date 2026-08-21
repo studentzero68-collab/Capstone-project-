@@ -538,6 +538,11 @@ function openDetail(listing) {
   $('detail-title').textContent = listing.title;
   $('detail-location').innerHTML = `📍 ${listing.location}`;
 
+  // Breadcrumb
+  if ($('bread-category')) $('bread-category').textContent = listing.badge;
+  if ($('bread-title'))    $('bread-title').textContent    = listing.title;
+  if ($('bread-home'))     $('bread-home').onclick = () => navigateTo('home');
+
   // Meta
   $('detail-meta-row').innerHTML = `
     <span>👥 ${listing.guests} guests</span>

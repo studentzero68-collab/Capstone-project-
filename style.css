@@ -979,3 +979,28 @@ mark {
 @media (max-width: 640px) {
   .culture-banner { grid-template-columns: 1fr; }
 }
+
+/* ===================== DETAIL PAGE BREADCRUMB ===================== */
+.detail-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+  font-family: var(--font-accent);
+  font-size: .9rem;
+  color: var(--white-dim);
+  margin-bottom: 1rem;
+}
+.detail-breadcrumb a,
+.detail-breadcrumb button {
+  color: var(--white-dim);
+  background: none;
+  border: none;
+  text-decoration: underline;
+  font-family: var(--font-accent);
+  font-size: .9rem;
+  cursor: pointer;
+  transition: color var(--transition);
+}
+.detail-breadcrumb a:hover,
+.detail-breadcrumb button:hover { color: var(--orange-warm); }
+.detail-breadcrumb .sep { color: rgba(255,255,255,.3); }
