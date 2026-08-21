@@ -828,6 +828,7 @@ function initFilterPanel() {
     bedCount = 0;
     $('bed-count').textContent = 'Any';
     $$('.prop-type-cb, .amenity-cb').forEach(cb => { cb.checked = false; });
+    updateFilterBadge();
   });
 
   // Apply
