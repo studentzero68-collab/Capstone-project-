@@ -290,7 +290,8 @@ const state = {
   homeListingsShown: 8,
   activeJourney: null,
   currentListing: null,
-  bookingGuests: 1
+  bookingGuests: 1,
+  recentlyViewed: JSON.parse(localStorage.getItem('zero_recent') || '[]')
 };
 
 /* ===================== DOM REFS ===================== */
@@ -508,6 +509,12 @@ function renderSearchResults() {
 /* ===================== DETAIL PAGE ===================== */
 function openDetail(listing) {
   state.currentListing = listing;
+
+  // Track recently viewed
+  state.recentlyViewed = state.recentlyViewed.filter(id => id !== listing.id);
+  state.recentlyViewed.unshift(listing.id);
+  if (state.recentlyViewed.length > 6) state.recentlyViewed = state.recentlyViewed.slice(0, 6);
+  localStorage.setItem('zero_recent', JSON.stringify(state.recentlyViewed));
 
   // Photos
   const photosEl = $('detail-photos');
