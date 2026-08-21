@@ -1004,3 +1004,13 @@ mark {
 .detail-breadcrumb a:hover,
 .detail-breadcrumb button:hover { color: var(--orange-warm); }
 .detail-breadcrumb .sep { color: rgba(255,255,255,.3); }
+
+/* ===================== PRINT STYLES ===================== */
+@media print {
+  .navbar, .cat-bar, .filter-panel, .back-to-top,
+  .animation-overlay, .reserve-toast, .footer,
+  .btn-reserve, .btn-back, .booking-form { display: none !important; }
+  body { background: #fff; color: #000; }
+  .detail-title { color: #000; }
+  .detail-description { color: #333; }
+}
