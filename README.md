@@ -75,20 +75,20 @@ The aesthetic is **chill but bold** — black, deep blue, and a sunset purple-to
 
 | Category | Description |
 |---|---|
-| 🌿 Treehouses | Canopy escapes in forests and mountains |
-| 🌊 Beach Spots | Beachside shacks, surf houses, coastal retreats |
-| 🚗 Garage Homes | Converted industrial spaces with car bays |
-| 🥐 Baker's Apartments | Professional kitchens, proofing ovens, homey feel |
-| 🎵 Musician Studios | Soundproofed live-in recording spaces |
-| 🎮 Gamer Dens | High-spec gaming setups, streaming corners |
+| Treehouses | Canopy escapes in forests and mountains |
+| Beach Spots | Beachside shacks, surf houses, coastal retreats |
+| Garage Homes | Converted industrial spaces with car bays |
+| Baker's Apartments | Professional kitchens, proofing ovens, homey feel |
+| Musician Studios | Soundproofed live-in recording spaces |
+| Gamer Dens | High-spec gaming setups, streaming corners |
 
 ## Cultural Sections
 
 | Culture | Vibe |
 |---|---|
-| 🇯🇵 Japanese | Tatami, onsen, zen gardens, minimalism |
-| 🇰🇷 Korean | Hanok-inspired, K-drama rooms, karaoke, skincare |
-| 🇿🇦 South African | Ubuntu spirit, braai, township art, Karoo farmstays |
+| Japanese | Tatami, onsen, zen gardens, minimalism |
+| Korean | Hanok-inspired, K-drama rooms, karaoke, skincare |
+| South African | Ubuntu spirit, braai, township art, Karoo farmstays |
 
 ---
 

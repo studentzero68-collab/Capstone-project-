@@ -29,9 +29,9 @@
   --gradient-sunset: linear-gradient(90deg,#7b2d8b,#c0392b,#e67e22,#f39c12);
   --gradient-glow:   radial-gradient(ellipse at center,rgba(123,45,139,.35) 0%,transparent 70%);
 
-  --font-heading: 'Lobster', cursive;
-  --font-accent:  'Caveat', cursive;
-  --font-body:    'Inter', sans-serif;
+  --font-heading: Arial, sans-serif;
+  --font-accent:  Arial, sans-serif;
+  --font-body:    Arial, sans-serif;
 
   --radius-sm:  8px;
   --radius-md:  16px;
@@ -134,7 +134,8 @@ input,select{font-family:var(--font-body)}
 /* Brand */
 .brand{display:flex;flex-direction:column;line-height:1.1;text-decoration:none;flex-shrink:0}
 .brand-zero{
-  font-family:var(--font-heading);font-style:italic;font-size:2.1rem;
+  font-family:'Lobster', cursive; /* preserve branding font */
+  font-style:italic;font-size:2.1rem;
   background:var(--gradient-sunset);
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text
 }
