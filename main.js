@@ -657,12 +657,12 @@ function playAnimation(type) {
 
   const configs = {
     romantic: {
-      label: '❤️ A Romantic Escape Awaits...',
+      label: 'A Romantic Escape Awaits...',
       count: 40,
       make: () => {
         const el = document.createElement('span');
         el.className = 'anim-particle';
-        el.textContent = ['🌹','❤️','🌸','💐','✨'][Math.floor(Math.random() * 5)];
+        el.textContent = ['rose','heart','bloom','bouquet','sparkle'][Math.floor(Math.random() * 5)];
         el.style.left  = Math.random() * 100 + 'vw';
         el.style.animationDuration = (2.5 + Math.random() * 2) + 's';
         el.style.animationDelay    = (Math.random() * 1.5) + 's';
@@ -671,12 +671,12 @@ function playAnimation(type) {
       }
     },
     friends: {
-      label: '✊ Let\'s Go Crew!',
+      label: 'Let\'s Go Crew!',
       count: 12,
       make: (i) => {
         const el = document.createElement('span');
         el.className = 'anim-fist';
-        el.textContent = ['✊','🤜','🤛','🙌','🎉'][i % 5];
+        el.textContent = ['fist','bump','cheer','raise','party'][i % 5];
         el.style.left = (5 + i * 8) + 'vw';
         el.style.top  = (20 + Math.random() * 50) + 'vh';
         el.style.animationDelay = (i * 0.12) + 's';
@@ -684,12 +684,12 @@ function playAnimation(type) {
       }
     },
     family: {
-      label: '🏠 Home is Where Your Family Is',
+      label: 'Home is Where Your Family Is',
       count: 10,
       make: (i) => {
         const el = document.createElement('span');
         el.className = 'anim-family';
-        el.textContent = ['👨‍👩‍👧‍👦','🏠','🌻','💛','👶','🐾'][i % 6];
+        el.textContent = ['family','home','sunflower','gold','child','paw'][i % 6];
         el.style.left = (5 + i * 9) + 'vw';
         el.style.top  = (15 + Math.random() * 55) + 'vh';
         el.style.animationDelay = (i * 0.18) + 's';
@@ -697,12 +697,12 @@ function playAnimation(type) {
       }
     },
     solo: {
-      label: '⚔️ Your Quest Begins...',
+      label: 'Your Quest Begins...',
       count: 1,
       make: () => {
         const el = document.createElement('span');
         el.className = 'anim-knight';
-        el.textContent = '♞';
+        el.textContent = 'knight';
         el.style.fontSize = '6rem';
         el.style.color = 'var(--gold)';
         return el;
