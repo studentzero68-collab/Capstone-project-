@@ -391,13 +391,13 @@ function toggleWishlist(id, btn) {
   const idx = state.wishlist.indexOf(id);
   if (idx === -1) {
     state.wishlist.push(id);
-    btn.innerHTML = '❤️';
+    btn.innerHTML = 'Saved';
     btn.classList.add('liked');
     btn.setAttribute('aria-pressed', 'true');
     btn.setAttribute('aria-label', 'Remove from wishlist');
   } else {
     state.wishlist.splice(idx, 1);
-    btn.innerHTML = '🤍';
+    btn.innerHTML = 'Save';
     btn.classList.remove('liked');
     btn.setAttribute('aria-pressed', 'false');
     btn.setAttribute('aria-label', 'Add to wishlist');
