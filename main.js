@@ -549,7 +549,7 @@ function openDetail(listing) {
   // Badge, title, location
   $('detail-badge').textContent = listing.badge;
   $('detail-title').textContent = listing.title;
-  $('detail-location').innerHTML = `📍 ${listing.location}`;
+  $('detail-location').innerHTML = listing.location;
 
   // Breadcrumb
   if ($('bread-category')) $('bread-category').textContent = listing.badge;
@@ -558,9 +558,9 @@ function openDetail(listing) {
 
   // Meta
   $('detail-meta-row').innerHTML = `
-    <span>👥 ${listing.guests} guests</span>
-    <span>🛏 ${listing.beds} bedroom${listing.beds > 1 ? 's' : ''}</span>
-    <span>🚿 ${listing.baths} bath${listing.baths > 1 ? 's' : ''}</span>`;
+    <span>${listing.guests} guests</span>
+    <span>${listing.beds} bedroom${listing.beds > 1 ? 's' : ''}</span>
+    <span>${listing.baths} bath${listing.baths > 1 ? 's' : ''}</span>`;
 
   // Rating
   $('detail-rating-row').innerHTML = `
@@ -592,7 +592,7 @@ function openDetail(listing) {
     div.className = 'review-card';
     div.innerHTML = `
       <div class="review-header">
-        <div class="review-avatar" aria-hidden="true">👤</div>
+        <div class="review-avatar" aria-hidden="true"></div>
         <div>
           <p class="review-name">${r.name}</p>
           <p class="review-date">${r.date}</p>
@@ -622,7 +622,7 @@ function openDetail(listing) {
   const savedBtn = $('btn-save-listing');
   if (savedBtn) {
     const isSaved = state.wishlist.includes(listing.id);
-    savedBtn.textContent = isSaved ? '❤️ Saved to Wishlist' : '🤍 Save to Wishlist';
+    savedBtn.textContent = isSaved ? 'Saved to Wishlist' : 'Save to Wishlist';
     savedBtn.classList.toggle('saved', isSaved);
   }
 }
