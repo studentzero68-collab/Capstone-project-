@@ -231,6 +231,100 @@
         </div>
       </section>
 
+      <!-- ===== DISCOVER EXPERIENCES ===== -->
+      <section class="experiences-section" id="experiences-section" aria-labelledby="exp-heading">
+        <div class="section-header reveal">
+          <h2 id="exp-heading" class="section-title">Discover Zero Experiences</h2>
+          <p class="section-sub">More than a place to sleep — find something to do.</p>
+        </div>
+        <div class="experiences-grid reveal">
+          <div class="exp-card">
+            <div class="exp-img-wrap">
+              <img src="https://images.unsplash.com/photo-1527529482837-4698179dc6ce?w=600&q=75" alt="Things to do on your trip" loading="lazy" />
+              <div class="exp-overlay"></div>
+            </div>
+            <div class="exp-body">
+              <h3>Things to do on your trip</h3>
+              <p>Activities, tours and adventures handpicked for every destination.</p>
+              <a href="#listings-section" class="btn-exp">Explore activities</a>
+            </div>
+          </div>
+          <div class="exp-card">
+            <div class="exp-img-wrap">
+              <img src="https://images.unsplash.com/photo-1528698827591-e19ccd7bc23d?w=600&q=75" alt="Things to do at home" loading="lazy" />
+              <div class="exp-overlay"></div>
+            </div>
+            <div class="exp-body">
+              <h3>Things to do at home</h3>
+              <p>Online experiences you can enjoy from wherever you are right now.</p>
+              <a href="#culture-section" class="btn-exp">Explore online</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== SHOP ZERO SECTION ===== -->
+      <section class="shop-section" id="shop-section" aria-labelledby="shop-heading">
+        <div class="shop-inner reveal">
+          <div class="shop-text">
+            <h2 id="shop-heading" class="section-title" style="text-align:left">Give the gift of Zero</h2>
+            <p class="section-sub" style="text-align:left">Gift cards for any stay, any journey, any dream.</p>
+            <a href="#" class="btn-hero" style="margin-top:1rem;display:inline-block">Shop gift cards</a>
+          </div>
+          <div class="shop-img">
+            <img src="https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=600&q=75" alt="Zero gift cards" loading="lazy" />
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== FUTURE GETAWAYS ===== -->
+      <section class="getaways-section" id="getaways-section" aria-labelledby="getaways-heading">
+        <div class="section-header reveal">
+          <h2 id="getaways-heading" class="section-title">Inspiration for Future Getaways</h2>
+          <p class="section-sub">Browse by destination type and start dreaming.</p>
+        </div>
+        <div class="getaways-tabs reveal" role="tablist" aria-label="Destination tabs">
+          <button class="getaway-tab active" role="tab" aria-selected="true" data-getaway="beaches">Beaches</button>
+          <button class="getaway-tab" role="tab" aria-selected="false" data-getaway="mountains">Mountains</button>
+          <button class="getaway-tab" role="tab" aria-selected="false" data-getaway="cities">Cities</button>
+          <button class="getaway-tab" role="tab" aria-selected="false" data-getaway="countryside">Countryside</button>
+        </div>
+        <div class="getaways-content" id="getaways-content">
+          <ul class="getaway-list" id="getaway-beaches">
+            <li><a href="#listings-section">Muizenberg, Cape Town</a></li>
+            <li><a href="#listings-section">Sodwana Bay, KwaZulu-Natal</a></li>
+            <li><a href="#listings-section">Plettenberg Bay, Western Cape</a></li>
+            <li><a href="#listings-section">Langebaan, Western Cape</a></li>
+            <li><a href="#listings-section">Jeffreys Bay, Eastern Cape</a></li>
+            <li><a href="#listings-section">Boulders Beach, Simon's Town</a></li>
+          </ul>
+          <ul class="getaway-list hidden" id="getaway-mountains">
+            <li><a href="#listings-section">Magaliesberg, North West</a></li>
+            <li><a href="#listings-section">Drakensberg, KwaZulu-Natal</a></li>
+            <li><a href="#listings-section">Cederberg, Western Cape</a></li>
+            <li><a href="#listings-section">Blyde River Canyon, Mpumalanga</a></li>
+            <li><a href="#listings-section">Swartberg Pass, Northern Cape</a></li>
+            <li><a href="#listings-section">Matroosberg, Western Cape</a></li>
+          </ul>
+          <ul class="getaway-list hidden" id="getaway-cities">
+            <li><a href="#listings-section">Cape Town, Western Cape</a></li>
+            <li><a href="#listings-section">Johannesburg, Gauteng</a></li>
+            <li><a href="#listings-section">Durban, KwaZulu-Natal</a></li>
+            <li><a href="#listings-section">Pretoria, Gauteng</a></li>
+            <li><a href="#listings-section">Port Elizabeth, Eastern Cape</a></li>
+            <li><a href="#listings-section">Stellenbosch, Western Cape</a></li>
+          </ul>
+          <ul class="getaway-list hidden" id="getaway-countryside">
+            <li><a href="#listings-section">Matjiesfontein, Northern Cape</a></li>
+            <li><a href="#listings-section">Franschhoek, Western Cape</a></li>
+            <li><a href="#listings-section">Clarens, Free State</a></li>
+            <li><a href="#listings-section">Graaff-Reinet, Eastern Cape</a></li>
+            <li><a href="#listings-section">Nieu-Bethesda, Eastern Cape</a></li>
+            <li><a href="#listings-section">McGregor, Western Cape</a></li>
+          </ul>
+        </div>
+      </section>
+
       <!-- Why Zero -->
       <section class="why-section" aria-labelledby="why-heading">
         <div class="section-header reveal">
@@ -393,6 +487,52 @@
               <h3 class="detail-sub-heading" id="reviews-heading">Reviews</h3>
               <div class="reviews-list" id="reviews-list" aria-label="Guest reviews">
                 <!-- Injected by JS -->
+              </div>
+            </div>
+            <hr class="detail-divider" />
+
+            <!-- Where you'll sleep -->
+            <div class="detail-sleep">
+              <h3 class="detail-sub-heading">Where you'll sleep</h3>
+              <div class="sleep-cards" id="sleep-cards">
+                <!-- Injected by JS -->
+              </div>
+            </div>
+            <hr class="detail-divider" />
+
+            <!-- House Rules / Health & Safety / Cancellation -->
+            <div class="detail-policies">
+              <h3 class="detail-sub-heading">Things to know</h3>
+              <div class="policies-grid">
+                <div class="policy-col">
+                  <h4 class="policy-heading">House rules</h4>
+                  <ul class="policy-list" aria-label="House rules">
+                    <li>Check-in after 3:00 PM</li>
+                    <li>Checkout before 11:00 AM</li>
+                    <li>No smoking</li>
+                    <li>No parties or events</li>
+                    <li>Pets allowed — check with host</li>
+                  </ul>
+                </div>
+                <div class="policy-col">
+                  <h4 class="policy-heading">Health &amp; safety</h4>
+                  <ul class="policy-list" aria-label="Health and safety">
+                    <li>Enhanced cleaning protocol</li>
+                    <li>Carbon monoxide alarm</li>
+                    <li>Smoke alarm</li>
+                    <li>Security camera on exterior</li>
+                    <li>Self check-in with smart lock</li>
+                  </ul>
+                </div>
+                <div class="policy-col">
+                  <h4 class="policy-heading">Cancellation policy</h4>
+                  <ul class="policy-list" aria-label="Cancellation policy">
+                    <li>Free cancellation before 48 hours</li>
+                    <li>50% refund up to 24 hours before</li>
+                    <li>No refund within 24 hours</li>
+                    <li>Review the full policy before booking</li>
+                  </ul>
+                </div>
               </div>
             </div>
           </div>

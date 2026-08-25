@@ -532,11 +532,13 @@ function openDetail(listing) {
   // Photos
   const photosEl = $('detail-photos');
   photosEl.innerHTML = '';
-  // Use same image 3 times with slight variation via different crops (Unsplash supports that)
+  // 5 images: first spans 2 rows (large left), 4 smaller stacked 2x2 on right
   const imgUrls = [
     listing.img,
-    listing.img.replace('w=600', 'w=601').replace('q=80', 'q=81'),
-    listing.img.replace('w=600', 'w=599').replace('q=80', 'q=79')
+    listing.img.replace('w=600','w=602').replace('q=80','q=78'),
+    listing.img.replace('w=600','w=598').replace('q=80','q=77'),
+    listing.img.replace('w=600','w=601').replace('q=80','q=76'),
+    listing.img.replace('w=600','w=599').replace('q=80','q=75')
   ];
   imgUrls.forEach((src, i) => {
     const img = document.createElement('img');
@@ -625,6 +627,21 @@ function openDetail(listing) {
     savedBtn.textContent = isSaved ? 'Saved to Wishlist' : 'Save to Wishlist';
     savedBtn.classList.toggle('saved', isSaved);
   }
+
+  // Where you'll sleep cards
+  const sleepEl = $('sleep-cards');
+  if (sleepEl) {
+    sleepEl.innerHTML = '';
+    for (let i = 0; i < listing.beds; i++) {
+      const card = document.createElement('div');
+      card.className = 'sleep-card';
+      card.innerHTML = `
+        <div class="sleep-card-icon" aria-hidden="true">&#127738;</div>
+        <h4>Bedroom ${i + 1}</h4>
+        <p>1 ${i === 0 ? 'queen' : 'double'} bed</p>`;
+      sleepEl.appendChild(card);
+    }
+  }
 }
 
 function updateBookingBreakdown() {
@@ -634,14 +651,22 @@ function updateBookingBreakdown() {
   const checkout = $('book-checkout').value;
 
   if (checkin && checkout && checkout > checkin) {
-    const nights = Math.round((new Date(checkout) - new Date(checkin)) / 86400000);
-    const subtotal = nights * state.currentListing.price;
-    const fee = Math.round(subtotal * 0.12);
-    const total = subtotal + fee;
+    const nights   = Math.round((new Date(checkout) - new Date(checkin)) / 86400000);
+    const l        = state.currentListing;
+    const subtotal = nights * l.price;
+    // Weekly discount: 10% if 7+ nights
+    const weeklyDiscount = nights >= 7 ? Math.round(subtotal * 0.10) : 0;
+    const cleaningFee    = Math.round(l.price * 0.15);
+    const serviceFee     = Math.round((subtotal - weeklyDiscount) * 0.12);
+    const occupancyTax   = Math.round((subtotal - weeklyDiscount + cleaningFee + serviceFee) * 0.08);
+    const total          = subtotal - weeklyDiscount + cleaningFee + serviceFee + occupancyTax;
     breakdown.innerHTML = `
-      <div class="breakdown-row"><span>R${state.currentListing.price.toLocaleString()} × ${nights} night${nights > 1 ? 's' : ''}</span><span>R${subtotal.toLocaleString()}</span></div>
-      <div class="breakdown-row"><span>Zero service fee</span><span>R${fee.toLocaleString()}</span></div>
-      <div class="breakdown-row total"><span>Total</span><span>R${total.toLocaleString()}</span></div>`;
+      <div class="breakdown-row"><span>${formatPrice(l.price)} × ${nights} night${nights>1?'s':''}</span><span>${formatPrice(subtotal)}</span></div>
+      ${weeklyDiscount ? `<div class="breakdown-row" style="color:var(--green)"><span>Weekly discount (10%)</span><span>-${formatPrice(weeklyDiscount)}</span></div>` : ''}
+      <div class="breakdown-row"><span>Cleaning fee</span><span>${formatPrice(cleaningFee)}</span></div>
+      <div class="breakdown-row"><span>Zero service fee</span><span>${formatPrice(serviceFee)}</span></div>
+      <div class="breakdown-row"><span>Occupancy taxes &amp; fees</span><span>${formatPrice(occupancyTax)}</span></div>
+      <div class="breakdown-row total"><span>Total</span><span>${formatPrice(total)}</span></div>`;
   } else {
     breakdown.innerHTML = `<p style="font-family:var(--font-accent);color:var(--white-dim);font-size:.9rem;text-align:center">Select dates to see total price</p>`;
   }
@@ -782,6 +807,19 @@ function initSort() {
   $('sort-select').addEventListener('change', e => {
     state.sortBy = e.target.value;
     renderSearchResults();
+  });
+}
+
+/* ===================== GETAWAYS TABS ===================== */
+function initGetawaysTabs() {
+  $$('.getaway-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      $$('.getaway-tab').forEach(t => { t.classList.remove('active'); t.setAttribute('aria-selected','false'); });
+      tab.classList.add('active'); tab.setAttribute('aria-selected','true');
+      $$('.getaway-list').forEach(l => l.classList.add('hidden'));
+      const target = $('getaway-' + tab.dataset.getaway);
+      if (target) target.classList.remove('hidden');
+    });
   });
 }
 
@@ -1218,6 +1256,7 @@ function init() {
   initSearchBar();
   initSort();
   initCultureTabs();
+  initGetawaysTabs();
   // Culture banner cards also trigger tab filter
   $$('.culture-banner-card').forEach(card => {
     const activate = () => {
