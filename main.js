@@ -968,7 +968,7 @@ function initBookingCard() {
       bookedAt: new Date().toISOString()
     });
     localStorage.setItem('zero_bookings', JSON.stringify(bookings));
-    showToast(`🎉 Reservation confirmed for ${nights} night${nights > 1 ? 's' : ''} at ${listing.title}!`, 'var(--green)');
+    showToast(`Reservation confirmed for ${nights} night${nights > 1 ? 's' : ''} at ${listing.title}!`, 'var(--green)');
   });
 
   // Save to wishlist from detail page
@@ -979,11 +979,11 @@ function initBookingCard() {
     const idx = state.wishlist.indexOf(id);
     if (idx === -1) {
       state.wishlist.push(id);
-      btn.textContent = '❤️ Saved to Wishlist';
+      btn.textContent = 'Saved to Wishlist';
       btn.classList.add('saved');
     } else {
       state.wishlist.splice(idx, 1);
-      btn.textContent = '🤍 Save to Wishlist';
+      btn.textContent = 'Save to Wishlist';
       btn.classList.remove('saved');
     }
     localStorage.setItem('zero_wishlist', JSON.stringify(state.wishlist));
