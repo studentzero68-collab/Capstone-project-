@@ -3,10 +3,18 @@ export default function Footer() {
     <footer className="footer" role="contentinfo">
       <div className="footer-grid">
         <div>
-          <div className="footer-brand" style={{ background: 'var(--gradient-sunset)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
+          <div
+            className="footer-brand"
+            style={{
+              background: 'var(--gradient-sunset)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+            }}
+          >
             Zero
           </div>
-          <p className="footer-tagline">Where every journey begins 🌍</p>
+          <p className="footer-tagline">Where every journey begins</p>
         </div>
 
         <div className="footer-col">
@@ -14,8 +22,8 @@ export default function Footer() {
           <ul>
             <li><a href="/">Home</a></li>
             <li><a href="/search">Browse stays</a></li>
-            <li><a href="/search?cat=treehouse">Treehouses</a></li>
-            <li><a href="/search?cat=beach">Beach spots</a></li>
+            <li><a href="/search">Treehouses</a></li>
+            <li><a href="/search">Beach spots</a></li>
           </ul>
         </div>
 
@@ -41,10 +49,12 @@ export default function Footer() {
       </div>
 
       <div className="footer-bottom">
-        <span>© 2026 Zero · Built with 💜 in South Africa</span>
+        <span>2026 Zero · Built with care in South Africa</span>
         <div className="footer-socials">
-          {['𝕏', 'IG', 'TT', 'YT'].map(s => (
-            <a key={s} href="#" className="footer-social" aria-label={`Zero on ${s}`}>{s}</a>
+          {['X', 'IG', 'TT', 'YT'].map(s => (
+            <a key={s} href="#" className="footer-social" aria-label={`Zero on ${s}`}>
+              {s}
+            </a>
           ))}
         </div>
         <span>

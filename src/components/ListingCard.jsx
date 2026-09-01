@@ -10,7 +10,14 @@ export default function ListingCard({ listing, wishlist, toggleWishlist, searchQ
     const parts = text.split(new RegExp(`(${escaped})`, 'gi'))
     return parts.map((p, i) =>
       p.toLowerCase() === searchQuery.toLowerCase()
-        ? <mark key={i} style={{ background: 'rgba(230,126,34,.35)', color: 'inherit', borderRadius: 2 }}>{p}</mark>
+        ? (
+          <mark
+            key={i}
+            style={{ background: 'rgba(230,126,34,.35)', color: 'inherit', borderRadius: 2 }}
+          >
+            {p}
+          </mark>
+        )
         : p
     )
   }
@@ -35,7 +42,7 @@ export default function ListingCard({ listing, wishlist, toggleWishlist, searchQ
           aria-pressed={isLiked}
           onClick={e => { e.stopPropagation(); toggleWishlist(listing.id) }}
         >
-          {isLiked ? '❤️ Saved' : '🤍 Save'}
+          {isLiked ? 'Saved' : 'Save'}
         </button>
       </div>
 
@@ -48,9 +55,11 @@ export default function ListingCard({ listing, wishlist, toggleWishlist, searchQ
           <span>{listing.baths} bath{listing.baths > 1 ? 's' : ''}</span>
         </div>
         <div className="card-rating">
-          <span aria-hidden="true">★</span>
+          <span aria-hidden="true">*</span>
           <span>{listing.rating}</span>
-          <span style={{ color: 'var(--text-dim)', fontSize: '.82rem' }}>({listing.reviews})</span>
+          <span style={{ color: 'var(--text-dim)', fontSize: '.82rem' }}>
+            ({listing.reviews})
+          </span>
         </div>
         <div className="card-price-row">
           <span className="card-price">{formatPrice(listing.price)}</span>

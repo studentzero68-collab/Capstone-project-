@@ -142,7 +142,7 @@ export default function SearchPage({
               )
             })}
 
-            <div className="map-label">🗺️ South Africa</div>
+            <div className="map-label">South Africa — Interactive Map</div>
           </div>
         </aside>
       </div>
