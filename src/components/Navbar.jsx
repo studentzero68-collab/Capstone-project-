@@ -11,6 +11,7 @@ export default function Navbar({
   guests, setGuests,
   setFilterOpen, handleSearch,
   showCatBar,
+  user, handleLogout,
 }) {
   const [menuOpen, setMenuOpen] = useState(false)
   const navigate = useNavigate()
@@ -101,9 +102,34 @@ export default function Navbar({
             {theme === 'dark' ? 'Light' : 'Dark'}
           </button>
 
-          <button className="btn-host" onClick={() => navigate('/admin')}>
-            Host on Zero
-          </button>
+          {/* Login / user button */}
+          {user ? (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '.6rem' }}>
+              <span style={{
+                fontFamily: 'var(--font-accent)', fontSize: '.9rem',
+                color: 'var(--text-dim)', maxWidth: 120,
+                overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+              }}>
+                {user.name}
+              </span>
+              {user.role === 'admin' && (
+                <button className="btn-host" onClick={() => navigate('/admin')}>
+                  Dashboard
+                </button>
+              )}
+              <button
+                className="btn-host"
+                style={{ borderColor: 'rgba(192,57,43,.5)', color: 'var(--sunset)' }}
+                onClick={handleLogout}
+              >
+                Sign out
+              </button>
+            </div>
+          ) : (
+            <button className="btn-host" onClick={() => navigate('/login')}>
+              Sign in
+            </button>
+          )}
 
           <button
             className="btn-menu"
@@ -139,12 +165,31 @@ export default function Navbar({
                 Browse stays
               </button>
               <hr className="dropdown-divider" />
-              <button
-                className="dropdown-item" role="menuitem"
-                onClick={() => { navigate('/admin'); setMenuOpen(false) }}
-              >
-                Admin dashboard
-              </button>
+              {user ? (
+                <>
+                  {user.role === 'admin' && (
+                    <button
+                      className="dropdown-item" role="menuitem"
+                      onClick={() => { navigate('/admin'); setMenuOpen(false) }}
+                    >
+                      Admin dashboard
+                    </button>
+                  )}
+                  <button
+                    className="dropdown-item" role="menuitem"
+                    onClick={() => { handleLogout(); setMenuOpen(false) }}
+                  >
+                    Sign out
+                  </button>
+                </>
+              ) : (
+                <button
+                  className="dropdown-item" role="menuitem"
+                  onClick={() => { navigate('/login'); setMenuOpen(false) }}
+                >
+                  Sign in
+                </button>
+              )}
               <button
                 className="dropdown-item" role="menuitem"
                 onClick={() => setMenuOpen(false)}
