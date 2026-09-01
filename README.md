@@ -5,7 +5,7 @@ A React + Vite conversion of the Zero Airbnb-inspired accommodation platform. Bu
 
 ---
 
-## 🚀 What's New in the React Version
+## What's New in the React Version
 
 ### Tech Stack
 - **React 18** with Functional Components
@@ -15,50 +15,50 @@ A React + Vite conversion of the Zero Airbnb-inspired accommodation platform. Bu
 - **Local Storage** for wishlist persistence
 
 ### Features
-✅ Home Page with Hero, Value Props, Listings Grid, and Newsletter  
-✅ Search Page with Filters (Price Range, Sort Options)  
-✅ Listing Detail Page with Host Info, Amenities, Reviews, and Booking  
-✅ Admin Dashboard with Login (Demo: admin@zero.com / password)  
-✅ Category Filtering across all listings  
-✅ Wishlist/Save functionality with persistence  
-✅ Fully Responsive Design (Mobile, Tablet, Desktop)  
-✅ Smooth Animations and Hover Effects  
-✅ Modal Navigation without page reloads  
+- Home Page with Hero, Value Props, Listings Grid, and Newsletter
+- Search Page with Filters (Price Range, Sort Options)
+- Listing Detail Page with Host Info, Amenities, Reviews, and Booking
+- Admin Dashboard with Login (Demo: admin@zero.com / password)
+- Category Filtering across all listings
+- Wishlist/Save functionality with persistence
+- Fully Responsive Design (Mobile, Tablet, Desktop)
+- Smooth Animations and Hover Effects
+- Modal Navigation without page reloads
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 src/
 ├── App.jsx                 # Main app component with routing logic
-├── main.jsx               # Entry point
-├── index.css              # Global styles
-├── App.css                # Main app styles
-├── data.js                # 18 Listings data
+├── main.jsx                # Entry point
+├── index.css               # Global styles
+├── App.css                 # Main app styles
+├── data.js                 # 18 Listings data
 │
 ├── components/
-│   ├── Navbar.jsx         # Navigation with search and category filter
-│   └── ListingCard.jsx    # Reusable listing card component
+│   ├── Navbar.jsx          # Navigation with search and category filter
+│   └── ListingCard.jsx     # Reusable listing card component
 │
 ├── pages/
-│   ├── HomePage.jsx       # Home page with hero, value props, listings
-│   ├── SearchPage.jsx     # Search results with filters and sorting
-│   ├── DetailPage.jsx     # Listing detail with booking
-│   └── AdminPage.jsx      # Admin dashboard with login
+│   ├── HomePage.jsx        # Home page with hero, value props, listings
+│   ├── SearchPage.jsx      # Search results with filters and sorting
+│   ├── DetailPage.jsx      # Listing detail with booking
+│   └── AdminPage.jsx       # Admin dashboard with login
 │
 └── styles/
-    ├── Navbar.css         # Navbar styling
-    ├── ListingCard.css    # Card styling
-    ├── HomePage.css       # Home page styling
-    ├── SearchPage.css     # Search page styling
-    ├── DetailPage.css     # Detail page styling
-    └── AdminPage.css      # Admin page styling
+    ├── Navbar.css          # Navbar styling
+    ├── ListingCard.css     # Card styling
+    ├── HomePage.css        # Home page styling
+    ├── SearchPage.css      # Search page styling
+    ├── DetailPage.css      # Detail page styling
+    └── AdminPage.css       # Admin page styling
 ```
 
 ---
 
-## 🎨 Key Components
+## Key Components
 
 ### App.jsx (Root Component)
 - Central state management for current page, wishlist, filters
@@ -119,7 +119,7 @@ src/
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Installation
 ```bash
@@ -141,7 +141,7 @@ npm run preview  # Preview production build
 
 ---
 
-## 🎯 How to Use
+## How to Use
 
 ### Navigate Between Pages
 - Click **brand logo** → Home
@@ -168,7 +168,7 @@ npm run preview  # Preview production build
 
 ---
 
-## 📱 Responsive Design
+## Responsive Design
 
 - **Desktop (1024px+):** Full grid layouts, 4-col listing grid
 - **Tablet (768px-1024px):** 2-col layouts, adjustable sidebars
@@ -176,7 +176,7 @@ npm run preview  # Preview production build
 
 ---
 
-## 📝 Comparing Original vs React Version
+## Comparing Original vs React Version
 
 | Feature | Original | React |
 |---------|----------|-------|
@@ -191,7 +191,7 @@ npm run preview  # Preview production build
 
 ---
 
-## 🚀 Future Enhancements
+## Future Enhancements
 
 - Add React Router for URL-based navigation
 - Implement Context API for global state
@@ -208,4 +208,4 @@ npm run preview  # Preview production build
 **Build Tool:** Vite 8.2.2  
 **React Version:** 18+
 
-Enjoy your Zero accommodation platform! 🌍✨
+Enjoy your Zero accommodation platform!
