@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { CATEGORIES } from '../data/listings'
+import { apiGetMyReservations } from '../services/api'
 
 export default function Navbar({
   theme, toggleTheme,
@@ -13,8 +14,22 @@ export default function Navbar({
   showCatBar,
   user, handleLogout,
 }) {
-  const [menuOpen, setMenuOpen] = useState(false)
+  const [menuOpen, setMenuOpen]         = useState(false)
+  const [resOpen, setResOpen]           = useState(false)
+  const [reservations, setReservations] = useState([])
+  const [resLoading, setResLoading]     = useState(false)
   const navigate = useNavigate()
+
+  const loadReservations = async () => {
+    if (!user) return
+    setResLoading(true)
+    try {
+      const data = await apiGetMyReservations()
+      setReservations(data.reservations || [])
+    } catch {
+      setReservations([])
+    } finally { setResLoading(false) }
+  }
 
   const doSearch = () => {
     handleSearch()
@@ -104,31 +119,56 @@ export default function Navbar({
 
           {/* Login / user button */}
           {user ? (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '.6rem' }}>
-              <span style={{
-                fontFamily: 'var(--font-accent)', fontSize: '.9rem',
-                color: 'var(--text-dim)', maxWidth: 120,
-                overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-              }}>
-                {user.name}
-              </span>
-              {user.role === 'admin' && (
-                <button className="btn-host" onClick={() => navigate('/admin')}>
-                  Dashboard
-                </button>
-              )}
+            <div style={{ display:'flex', alignItems:'center', gap:'.6rem', position:'relative' }}>
+              {/* Reservations dropdown */}
               <button
                 className="btn-host"
-                style={{ borderColor: 'rgba(192,57,43,.5)', color: 'var(--sunset)' }}
-                onClick={handleLogout}
+                onClick={() => { setResOpen(o => !o); if (!resOpen) loadReservations() }}
+                aria-haspopup="true" aria-expanded={resOpen}
               >
+                My Trips
+              </button>
+
+              {resOpen && (
+                <div className="nav-dropdown" style={{ minWidth:300, right:0, top:'calc(100% + 8px)', position:'absolute', zIndex:400 }} role="dialog" aria-label="My reservations">
+                  <div style={{ padding:'.75rem 1.1rem', borderBottom:'1px solid var(--border-color)' }}>
+                    <p style={{ fontFamily:'var(--font-heading)', fontStyle:'italic', fontSize:'1.1rem', color:'var(--text-main)' }}>My Reservations</p>
+                  </div>
+                  <div style={{ maxHeight:280, overflowY:'auto' }}>
+                    {resLoading ? (
+                      <p style={{ padding:'1rem', color:'var(--text-dim)', fontSize:'.9rem' }}>Loading...</p>
+                    ) : reservations.length===0 ? (
+                      <p style={{ padding:'1rem', color:'var(--text-dim)', fontSize:'.9rem' }}>No reservations yet. Book a stay!</p>
+                    ) : (
+                      reservations.map((r,i) => (
+                        <div key={r._id||i} style={{ padding:'.65rem 1.1rem', borderBottom:'1px solid var(--border-color)', fontSize:'.88rem' }}>
+                          <p style={{ fontWeight:600, color:'var(--text-main)' }}>{r.accommodation?.title || 'Stay'}</p>
+                          <p style={{ color:'var(--text-dim)', marginTop:'.1rem' }}>
+                            {r.checkin ? new Date(r.checkin).toLocaleDateString('en-ZA') : '—'} &rarr; {r.checkout ? new Date(r.checkout).toLocaleDateString('en-ZA') : '—'}
+                          </p>
+                          <p style={{ color:'var(--gold)', marginTop:'.1rem' }}>R{Number(r.total||0).toLocaleString('en-ZA')}</p>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                  <div style={{ padding:'.5rem .75rem' }}>
+                    <button className="dropdown-item" style={{ textAlign:'center', width:'100%' }} onClick={() => setResOpen(false)}>Close</button>
+                  </div>
+                </div>
+              )}
+
+              <span style={{ fontFamily:'var(--font-accent)', fontSize:'.88rem', color:'var(--text-dim)', maxWidth:100, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
+                {user.name}
+              </span>
+              {user.role==='admin' && (
+                <button className="btn-host" onClick={() => navigate('/admin')}>Dashboard</button>
+              )}
+              <button className="btn-host" style={{ borderColor:'rgba(192,57,43,.5)', color:'var(--sunset)' }} onClick={handleLogout}>
                 Sign out
               </button>
             </div>
           ) : (
-            <button className="btn-host" onClick={() => navigate('/login')}>
-              Sign in
-            </button>
+            <button className="btn-host" onClick={() => navigate('/login')}>Sign in</button>
           )}
 
           <button

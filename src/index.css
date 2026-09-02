@@ -1265,3 +1265,194 @@ input, select { font-family: var(--font-body); }
   .login-left { display: none; }
   .login-right { padding: 2rem 1.25rem; min-height: 100vh; }
 }
+
+/* ===================== INSPIRATION SECTION ===================== */
+.inspiration-section { padding: 4rem 1.5rem; background: var(--bg-page); }
+.inspiration-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1.25rem; max-width: 1440px; margin: 0 auto;
+}
+.inspiration-card {
+  background: none; border: none; cursor: pointer; text-align: left;
+  border-radius: var(--radius-md); overflow: hidden;
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+.inspiration-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-glow); }
+.inspiration-card img {
+  width: 100%; height: 160px; object-fit: cover;
+  border-radius: var(--radius-md); margin-bottom: .65rem;
+  transition: transform .5s ease;
+}
+.inspiration-card:hover img { transform: scale(1.05); }
+.inspiration-city    { font-family: var(--font-heading); font-style: italic; font-size: 1.1rem; color: var(--text-main); }
+.inspiration-country { font-family: var(--font-accent); font-size: .85rem; color: var(--text-dim); }
+.inspiration-type    { font-size: .78rem; color: var(--blue-light); margin-top: .2rem; font-family: var(--font-accent); }
+
+/* ===================== EXPERIENCES SECTION ===================== */
+.experiences-section { padding: 4.5rem 1.5rem; background: var(--black-soft); }
+.experiences-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1.5rem; max-width: 1200px; margin: 0 auto;
+}
+.experience-card {
+  background: var(--bg-card); border: 1px solid var(--border-color);
+  border-radius: var(--radius-md); overflow: hidden;
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+.experience-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-glow); }
+.experience-img-wrap { position: relative; height: 200px; }
+.experience-img-wrap img { width: 100%; height: 100%; object-fit: cover; }
+.experience-duration {
+  position: absolute; bottom: .75rem; left: .75rem;
+  background: rgba(10,10,15,.75); color: var(--white);
+  font-family: var(--font-accent); font-size: .78rem;
+  padding: .2rem .6rem; border-radius: var(--radius-xl);
+}
+.experience-body { padding: 1rem; }
+.experience-host  { font-family: var(--font-accent); font-size: .82rem; color: var(--text-dim); margin-bottom: .25rem; }
+.experience-title { font-family: var(--font-heading); font-style: italic; font-size: 1.05rem; color: var(--text-main); margin-bottom: .5rem; }
+.experience-meta  { display: flex; align-items: center; justify-content: space-between; gap: .5rem; flex-wrap: wrap; }
+
+/* ===================== THINGS TO DO SECTION ===================== */
+.things-section {
+  display: grid; grid-template-columns: 1fr 1fr;
+  height: 420px; overflow: hidden;
+}
+.things-card {
+  position: relative; overflow: hidden;
+  background-size: cover; background-position: center;
+  background-repeat: no-repeat;
+}
+.things-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(10,10,15,.85) 0%, rgba(10,10,15,.3) 60%, transparent 100%);
+  display: flex; flex-direction: column; justify-content: flex-end;
+  padding: 2.5rem 2rem;
+}
+.things-title {
+  font-family: var(--font-heading); font-style: italic;
+  font-size: clamp(1.5rem, 2.5vw, 2.2rem); color: #fff;
+  margin-bottom: .65rem; line-height: 1.2;
+}
+.things-sub {
+  font-family: var(--font-accent); font-size: .92rem;
+  color: rgba(255,255,255,.75); margin-bottom: 1.25rem;
+  max-width: 360px; line-height: 1.6;
+}
+@media (max-width: 700px) {
+  .things-section { grid-template-columns: 1fr; height: auto; }
+  .things-card { min-height: 280px; }
+}
+
+/* ===================== SHOPZERO SECTION ===================== */
+.shopzero-section {
+  padding: 5rem 1.5rem;
+  background: linear-gradient(135deg, var(--blue-mid), var(--black-card));
+}
+.shopzero-inner {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 3rem; max-width: 1100px; margin: 0 auto; align-items: center;
+}
+.shopzero-title {
+  font-family: var(--font-heading); font-style: italic;
+  font-size: clamp(2rem, 4vw, 3.2rem); color: var(--text-main);
+  background: var(--gradient-sunset);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  line-height: 1.1; margin-bottom: .75rem;
+}
+.shopzero-sub {
+  font-family: var(--font-accent); font-size: 1.05rem;
+  color: var(--text-dim); line-height: 1.7; max-width: 420px;
+}
+.shopzero-right { display: flex; justify-content: center; align-items: center; min-height: 220px; }
+.shopzero-card-stack { position: relative; width: 220px; height: 140px; }
+.shopzero-gift-card {
+  position: absolute; width: 200px; height: 120px;
+  border-radius: var(--radius-md);
+  display: flex; flex-direction: column;
+  padding: 1rem 1.25rem; gap: .3rem;
+  box-shadow: 0 8px 24px rgba(0,0,0,.4);
+}
+@media (max-width: 700px) {
+  .shopzero-inner { grid-template-columns: 1fr; }
+  .shopzero-right { display: none; }
+}
+
+/* ===================== GETAWAYS SECTION ===================== */
+.getaways-section { padding: 4.5rem 1.5rem; background: var(--bg-page); }
+.getaways-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1.25rem; max-width: 1200px; margin: 0 auto;
+}
+.getaway-card {
+  background: none; border: none; cursor: pointer; text-align: left;
+  border-radius: var(--radius-md); overflow: hidden;
+  transition: transform var(--transition);
+}
+.getaway-card:hover { transform: translateY(-3px); }
+.getaway-card img {
+  width: 100%; height: 150px; object-fit: cover;
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+}
+.getaway-card-body {
+  background: var(--bg-card); border: 1px solid var(--border-color);
+  border-top: none; border-radius: 0 0 var(--radius-md) var(--radius-md);
+  padding: .75rem 1rem;
+}
+.getaway-city   { font-family: var(--font-heading); font-style: italic; font-size: 1rem; color: var(--text-main); }
+.getaway-nights { font-family: var(--font-accent); font-size: .82rem; color: var(--text-dim); margin-top: .2rem; }
+
+/* ===================== WHERE YOU'LL SLEEP ===================== */
+.sleep-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 1rem; margin-bottom: 0;
+}
+.sleep-card {
+  background: var(--bg-card); border: 1px solid var(--border-color);
+  border-radius: var(--radius-md); overflow: hidden;
+}
+.sleep-card img { width: 100%; height: 130px; object-fit: cover; }
+.sleep-card-body { padding: .75rem 1rem; }
+.sleep-room { font-family: var(--font-heading); font-style: italic; font-size: 1rem; color: var(--text-main); }
+.sleep-desc { font-family: var(--font-accent); font-size: .85rem; color: var(--text-dim); margin-top: .2rem; }
+
+/* ===================== SPECIFIC RATINGS ===================== */
+.specific-ratings-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: .85rem 2rem; margin-bottom: 1.5rem;
+}
+.specific-rating-row { display: flex; align-items: center; gap: .75rem; }
+.specific-rating-label {
+  font-size: .88rem; color: var(--text-main); min-width: 100px; font-weight: 500;
+}
+.specific-rating-bar {
+  flex: 1; height: 4px; background: var(--border-color); border-radius: 2px; overflow: hidden;
+}
+.specific-rating-fill {
+  height: 100%;
+  background: var(--gradient-sunset);
+  border-radius: 2px; transition: width .6s ease;
+}
+.specific-rating-val {
+  font-family: var(--font-accent); font-size: .88rem; color: var(--gold); min-width: 28px; text-align: right;
+}
+
+/* ===================== HOST DETAIL CARD ===================== */
+.host-detail-card {
+  display: flex; gap: 1.5rem; align-items: flex-start;
+  background: var(--bg-card); border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg); padding: 1.5rem;
+}
+.host-detail-avatar {
+  width: 72px; height: 72px; border-radius: 50%; flex-shrink: 0;
+  background: var(--gradient-sunset);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-heading); font-style: italic;
+  font-size: 2rem; color: #fff;
+}
+.host-detail-name  { font-family: var(--font-heading); font-style: italic; font-size: 1.3rem; color: var(--text-main); }
+.host-detail-meta  { font-family: var(--font-accent); font-size: .88rem; color: var(--text-dim); margin: .2rem 0; }
+.host-detail-stats { font-family: var(--font-accent); font-size: .88rem; color: var(--gold); margin-bottom: .5rem; }
+.host-detail-bio   { font-size: .9rem; color: var(--text-dim); line-height: 1.7; }
