@@ -19,7 +19,7 @@ import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { LISTINGS } from '../data/listings'
 import { useAuth } from '../context/AuthContext'
-import { apiCreateReservation } from '../services/api'
+import { apiCreateReservation, saveLocalReservation } from '../services/api'
 
 // Bedroom card images per category
 const BEDROOM_IMGS = {
@@ -95,8 +95,23 @@ export default function DetailPage({ wishlist, toggleWishlist }) {
         occupancyTaxes: taxes, total,
       })
       setReserved(true)
+      window.dispatchEvent(new CustomEvent('zero:reservation-created'))
     } catch {
-      // Backend offline — still show success for demo purposes
+      saveLocalReservation(user, {
+        _id: `local-${Date.now()}`,
+        user: { username: user.name, email: user.email },
+        accommodation: {
+          title: listing.title,
+          location: listing.location,
+          price: listing.price,
+          images: listing.images || listing.photos,
+        },
+        checkin,
+        checkout,
+        guests: bookGuests,
+        total,
+        status: 'confirmed',
+      })
       setReserved(true)
     } finally {
       setResLoading(false)

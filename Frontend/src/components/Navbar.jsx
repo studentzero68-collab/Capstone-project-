@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { CATEGORIES } from '../data/listings'
-import { apiGetMyReservations } from '../services/api'
+import { apiGetMyReservations, getLocalReservations } from '../services/api'
 
 export default function Navbar({
   theme, toggleTheme,
@@ -21,14 +21,27 @@ export default function Navbar({
   const [resLoading, setResLoading]     = useState(false)
   const navigate = useNavigate()
 
+  useEffect(() => {
+    const refreshReservations = () => loadReservations()
+    window.addEventListener('zero:reservation-created', refreshReservations)
+    return () => window.removeEventListener('zero:reservation-created', refreshReservations)
+  }, [user])
+
   const loadReservations = async () => {
     if (!user) return
+    const localReservations = getLocalReservations(user)
+    setReservations(localReservations)
     setResLoading(true)
     try {
       const data = await apiGetMyReservations()
-      setReservations(data.reservations || [])
+      const remoteReservations = data.reservations || []
+      const remoteIds = new Set(remoteReservations.map(reservation => reservation._id))
+      setReservations([
+        ...remoteReservations,
+        ...localReservations.filter(reservation => !remoteIds.has(reservation._id)),
+      ])
     } catch {
-      setReservations([])
+      setReservations(localReservations)
     } finally { setResLoading(false) }
   }
 

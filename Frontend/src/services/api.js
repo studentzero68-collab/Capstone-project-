@@ -136,3 +136,19 @@ export const apiDeleteReservation = async (id) => {
   })
   return handleResponse(res)
 }
+
+const localReservationsKey = (user) => `zero_reservations_${user?.id || user?.email || 'guest'}`
+
+export const getLocalReservations = (user) => {
+  try {
+    return JSON.parse(localStorage.getItem(localReservationsKey(user)) || '[]')
+  } catch {
+    return []
+  }
+}
+
+export const saveLocalReservation = (user, reservation) => {
+  const reservations = [reservation, ...getLocalReservations(user)]
+  localStorage.setItem(localReservationsKey(user), JSON.stringify(reservations))
+  window.dispatchEvent(new CustomEvent('zero:reservation-created'))
+}
