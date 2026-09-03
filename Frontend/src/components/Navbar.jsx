@@ -14,6 +14,7 @@ export default function Navbar({
   showCatBar,
   user, handleLogout,
 }) {
+  const today = new Date().toISOString().split('T')[0]
   const [menuOpen, setMenuOpen]         = useState(false)
   const [resOpen, setResOpen]           = useState(false)
   const [reservations, setReservations] = useState([])
@@ -72,6 +73,7 @@ export default function Navbar({
               id="nsb-checkin"
               type="date"
               value={checkin}
+              min={today}
               onChange={e => setCheckin(e.target.value)}
               aria-label="Check-in date"
             />
@@ -83,6 +85,7 @@ export default function Navbar({
               id="nsb-checkout"
               type="date"
               value={checkout}
+              min={checkin || today}
               onChange={e => setCheckout(e.target.value)}
               aria-label="Check-out date"
             />

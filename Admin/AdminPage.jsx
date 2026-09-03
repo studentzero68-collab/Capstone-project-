@@ -6,7 +6,7 @@
  */
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useAuth } from '../context/AuthContext'
+import { useAuth } from '../Frontend/src/context/AuthContext'
 import {
   apiGetAccommodations,
   apiCreateAccommodation,
@@ -15,8 +15,8 @@ import {
   apiGetAllReservations,
   apiGetHostReservations,
   apiDeleteReservation,
-} from '../services/api'
-import { LISTINGS } from '../data/listings'
+} from '../Frontend/src/services/api'
+import { LISTINGS } from '../Frontend/src/data/listings'
 
 // ── Static mock data shown when backend is offline ───────────────
 const MOCK_BOOKINGS = [

@@ -6,7 +6,7 @@ import Footer from './components/Footer'
 import HomePage from './pages/HomePage'
 import SearchPage from './pages/SearchPage'
 import DetailPage from './pages/DetailPage'
-import AdminPage from './pages/AdminPage'
+import AdminPage from '../../Admin/AdminPage'
 import LoginPage from './pages/LoginPage'
 
 // Protect admin routes — redirect to login if not signed in as admin

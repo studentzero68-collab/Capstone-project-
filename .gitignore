@@ -31,7 +31,7 @@ yarn-error.log*
 Thumbs.db
 
 # Uploads
-server/uploads/
+Backend/uploads/
 
 # Testing
 coverage/

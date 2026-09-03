@@ -46,6 +46,7 @@ export default function DetailPage({ wishlist, toggleWishlist }) {
   const [reserved, setReserved]     = useState(false)
   const [resLoading, setResLoading] = useState(false)
   const [resError, setResError]     = useState('')
+  const today = new Date().toISOString().split('T')[0]
 
   useEffect(() => { window.scrollTo({ top:0, behavior:'smooth' }) }, [id])
 
@@ -326,13 +327,13 @@ export default function DetailPage({ wishlist, toggleWishlist }) {
                 <div className="booking-field">
                   <label htmlFor="book-ci">Check in</label>
                   <input id="book-ci" type="date" value={checkin}
-                    min={new Date().toISOString().split('T')[0]}
+                    min={today}
                     onChange={e => setCheckin(e.target.value)} />
                 </div>
                 <div className="booking-field">
                   <label htmlFor="book-co">Check out</label>
                   <input id="book-co" type="date" value={checkout}
-                    min={checkin || new Date().toISOString().split('T')[0]}
+                    min={checkin || today}
                     onChange={e => setCheckout(e.target.value)} />
                 </div>
               </div>

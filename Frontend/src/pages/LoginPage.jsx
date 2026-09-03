@@ -1,10 +1,15 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth, DEMO_USERS } from '../context/AuthContext'
 
 export default function LoginPage() {
   const navigate = useNavigate()
-  const { login } = useAuth()
+  const { user, login } = useAuth()
+
+  useEffect(() => {
+    if (!user) return
+    navigate(user.role === 'admin' ? '/admin' : '/', { replace: true })
+  }, [navigate, user])
 
   const [role, setRole]       = useState('guest')  // 'guest' | 'admin'
   const [email, setEmail]     = useState('')
@@ -23,7 +28,7 @@ export default function LoginPage() {
     setLoading(true)
     // Small delay for UX feel
     await new Promise(r => setTimeout(r, 600))
-    const result = login(email.trim(), password, role)
+    const result = await login(email.trim(), password, role)
     setLoading(false)
     if (result.ok) {
       navigate(result.user.role === 'admin' ? '/admin' : '/')

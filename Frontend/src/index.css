@@ -82,8 +82,8 @@
 /* ---------- Font vars ---------- */
 :root {
   --font-heading: 'Lobster', cursive;
-  --font-accent:  'Caveat', cursive;
-  --font-body:    'Inter', sans-serif;
+  --font-accent:  'Source Sans 3', sans-serif;
+  --font-body:    'Source Sans 3', sans-serif;
   --radius-sm:  8px;
   --radius-md:  16px;
   --radius-lg:  24px;
@@ -220,7 +220,16 @@ input, select { font-family: var(--font-body); }
 .nsb-field label { font-size: .65rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--text-dim); }
 .nsb-field input { background: transparent; border: none; outline: none; color: var(--text-main); font-size: .88rem; padding: 0; width: 100%; }
 .nsb-field input::placeholder { color: var(--text-dim); }
-.nsb-field input[type="date"] { color-scheme: dark; }
+.nsb-field input[type="date"],
+.booking-field input[type="date"] {
+  color-scheme: light dark;
+  cursor: pointer;
+}
+.nsb-field input[type="date"]::-webkit-calendar-picker-indicator,
+.booking-field input[type="date"]::-webkit-calendar-picker-indicator {
+  opacity: .8;
+  cursor: pointer;
+}
 .nsb-guests-display { font-size: .88rem; color: var(--text-dim); cursor: pointer; }
 .nsb-divider { width: 1px; background: var(--border-color); margin: .5rem 0; flex-shrink: 0; }
 .nsb-search-btn {
