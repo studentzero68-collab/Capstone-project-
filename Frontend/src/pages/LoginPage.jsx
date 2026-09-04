@@ -113,7 +113,11 @@ export default function LoginPage() {
 
     if (result.ok) {
       // Auto-logged in — useEffect above will redirect
-      setSuccessMsg('Account created! Signing you in...')
+      if (result.warning) {
+        setSuccessMsg(result.warning)
+      } else {
+        setSuccessMsg('Account created! Signing you in...')
+      }
     } else {
       // Common: email already taken
       if (result.error?.toLowerCase().includes('email')) {
