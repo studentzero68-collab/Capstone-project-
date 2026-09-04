@@ -187,6 +187,7 @@ export default function DetailPage({ wishlist, toggleWishlist }) {
       setReserved(true)
       window.dispatchEvent(new CustomEvent('zero:reservation-created'))
       window.alert('Reservation confirmed. Please note: reservations cannot be cancelled on the day of the reservation.')
+      navigate('/search')
     } catch {
       // Backend offline — save to localStorage so Navbar "My Trips" still works
       saveLocalReservation(user, {
@@ -205,6 +206,7 @@ export default function DetailPage({ wishlist, toggleWishlist }) {
       })
       setReserved(true)
       window.alert('Reservation saved. Please note: reservations cannot be cancelled on the day of the reservation.')
+      navigate('/search')
     } finally {
       setResLoading(false)
     }

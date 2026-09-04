@@ -12,6 +12,7 @@ import {
   apiUpdateAccommodation,
   apiDeleteAccommodation,
   apiGetAllReservations,
+  apiGetHostReservations,
   apiDeleteReservation,
 } from '../services/api'
 import { LISTINGS } from '../data/listings'
@@ -55,13 +56,25 @@ export default function AdminPage({ theme, toggleTheme }) {
 
   const [reservations, setReservations] = useState(MOCK_BOOKINGS)
   const [resLoading, setResLoading]     = useState(false)
+  const [reservationNotice, setReservationNotice] = useState('')
+  const knownReservationIds = useRef(null)
 
   const avgRating = (LISTINGS.reduce((s,l) => s + l.rating, 0) / LISTINGS.length).toFixed(2)
 
   useEffect(() => {
     if (activeTab === 'listings' || activeTab === 'overview') fetchListings()
-    if (activeTab === 'reservations') fetchReservations()
-  }, [activeTab])
+    if (activeTab === 'reservations' || activeTab === 'overview') fetchReservations()
+  }, [activeTab, user?.backendRole])
+
+  useEffect(() => {
+    const refresh = () => fetchReservations(true)
+    window.addEventListener('zero:reservation-created', refresh)
+    const interval = window.setInterval(() => fetchReservations(true), 15000)
+    return () => {
+      window.removeEventListener('zero:reservation-created', refresh)
+      window.clearInterval(interval)
+    }
+  }, [user?.backendRole])
 
   const fetchListings = async () => {
     setListingsLoading(true); setListingsError('')
@@ -73,11 +86,26 @@ export default function AdminPage({ theme, toggleTheme }) {
     } finally { setListingsLoading(false) }
   }
 
-  const fetchReservations = async () => {
+  const fetchReservations = async (notify = false) => {
     setResLoading(true)
     try {
-      const data = await apiGetAllReservations()
-      if (data.reservations?.length) setReservations(data.reservations)
+      const data = user?.backendRole === 'host'
+        ? await apiGetHostReservations()
+        : await apiGetAllReservations()
+      const nextReservations = data.reservations || []
+      const nextIds = new Set(nextReservations.map(reservation => reservation._id))
+      const hasNewReservation = knownReservationIds.current
+        ? nextReservations.some(reservation => !knownReservationIds.current.has(reservation._id))
+        : nextReservations.length > 0
+      if ((notify || knownReservationIds.current === null) && hasNewReservation) {
+        setReservationNotice(
+          knownReservationIds.current === null
+            ? `You have ${nextReservations.length} reservation${nextReservations.length === 1 ? '' : 's'} to review.`
+            : 'New reservation received. Review it in the Reservations tab.'
+        )
+      }
+      knownReservationIds.current = nextIds
+      setReservations(nextReservations)
     } catch { /* keep mock */ }
     finally { setResLoading(false) }
   }
@@ -174,6 +202,13 @@ export default function AdminPage({ theme, toggleTheme }) {
 
   return (
     <div className="admin-layout">
+      {reservationNotice && (
+        <div role="status" style={{ position:'fixed', top:'1rem', right:'1rem', zIndex:600, maxWidth:340, padding:'1rem 1.2rem', background:'var(--bg-card)', border:'1px solid var(--green)', color:'var(--text-main)', boxShadow:'0 12px 30px rgba(0,0,0,.25)' }}>
+          <strong>Reservation alert</strong>
+          <p style={{ marginTop:'.35rem', fontSize:'.88rem' }}>{reservationNotice}</p>
+          <button className="dropdown-item" style={{ padding:'.55rem 0 0', color:'var(--green)' }} onClick={() => { setActiveTab('reservations'); setReservationNotice('') }}>View reservations</button>
+        </div>
+      )}
       {/* Sidebar */}
       <aside className="admin-sidebar" aria-label="Admin navigation">
         <span className="admin-logo">Zero</span>

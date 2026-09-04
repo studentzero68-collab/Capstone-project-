@@ -14,7 +14,7 @@ router.use(protect)
 
 router.post('/',          createReservation)
 router.get('/user',       getReservationsByUser)
-router.get('/host',       getReservationsByHost)
+router.get('/host',       restrictTo('host', 'admin'), getReservationsByHost)
 router.get('/',           restrictTo('admin'), getAllReservations)
 router.delete('/:id',     deleteReservation)
 
