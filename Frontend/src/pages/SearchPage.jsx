@@ -21,18 +21,6 @@ const normalise = (doc) => ({
   host:     doc.host?.username || doc.host || 'Host',
 })
 
-// Map pin positions for the decorative map panel
-const MAP_PINS = [
-  { idx: 0, top: '20%', left: '30%' },
-  { idx: 1, top: '35%', left: '55%' },
-  { idx: 2, top: '60%', left: '25%' },
-  { idx: 3, top: '45%', left: '70%' },
-  { idx: 4, top: '25%', left: '65%' },
-  { idx: 5, top: '70%', left: '50%' },
-  { idx: 6, top: '55%', left: '40%' },
-  { idx: 7, top: '80%', left: '30%' },
-]
-
 export default function SearchPage({
   searchQuery,
   filters, setFilters,
@@ -160,42 +148,6 @@ export default function SearchPage({
           </div>
         </div>
 
-        {/* ── Map column ── */}
-        <aside className="search-map-col" aria-label="Map view">
-          <div className="map-bg">
-            {/* Grid lines */}
-            <svg
-              style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: .12 }}
-              aria-hidden="true"
-            >
-              {[10, 20, 30, 40, 50, 60, 70, 80, 90].map(p => (
-                <g key={p}>
-                  <line x1={`${p}%`} y1="0" x2={`${p}%`} y2="100%" stroke="#4fc3f7" strokeWidth="1" />
-                  <line x1="0" y1={`${p}%`} x2="100%" y2={`${p}%`} stroke="#4fc3f7" strokeWidth="1" />
-                </g>
-              ))}
-            </svg>
-
-            {/* Map pins — use first 8 listings from live results */}
-            {MAP_PINS.map(pin => {
-              const listing = results[pin.idx]
-              if (!listing) return null
-              return (
-                <div
-                  key={pin.idx}
-                  className="map-pin"
-                  style={{ top: pin.top, left: pin.left }}
-                  title={listing.title}
-                >
-                  <div className="map-pin-dot" />
-                  <div className="map-pin-price">{formatPrice(listing.price)}</div>
-                </div>
-              )
-            })}
-
-            <div className="map-label">South Africa</div>
-          </div>
-        </aside>
       </div>
     </main>
   )
