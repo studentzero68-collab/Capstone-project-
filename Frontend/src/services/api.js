@@ -25,7 +25,11 @@ const headers = (auth = false, json = true) => {
 
 const handleResponse = async (res) => {
   const data = await res.json().catch(() => ({}))
-  if (!res.ok) throw new Error(data.message || `HTTP ${res.status}`)
+  if (!res.ok) {
+    const error = new Error(data.message || `HTTP ${res.status}`)
+    error.status = res.status
+    throw error
+  }
   return data
 }
 
@@ -152,5 +156,13 @@ export const getLocalReservations = (user) => {
 export const saveLocalReservation = (user, reservation) => {
   const existing = getLocalReservations(user)
   localStorage.setItem(localKey(user), JSON.stringify([reservation, ...existing]))
+  window.dispatchEvent(new CustomEvent('zero:reservation-created'))
+}
+
+export const removeLocalReservation = (user, reservationId) => {
+  const remaining = getLocalReservations(user).filter(
+    reservation => reservation._id !== reservationId
+  )
+  localStorage.setItem(localKey(user), JSON.stringify(remaining))
   window.dispatchEvent(new CustomEvent('zero:reservation-created'))
 }

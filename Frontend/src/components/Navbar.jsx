@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { CATEGORIES } from '../data/listings'
-import { apiGetMyReservations, getLocalReservations } from '../services/api'
+import { apiDeleteReservation, apiGetMyReservations, getLocalReservations, removeLocalReservation } from '../services/api'
 
 export default function Navbar({
   theme, toggleTheme,
@@ -48,6 +48,34 @@ export default function Navbar({
   const doSearch = () => {
     handleSearch()
     setMenuOpen(false)
+  }
+
+  const canCancel = reservation => {
+    if (!reservation.checkin || reservation.status === 'cancelled') return false
+    const checkinDate = new Date(reservation.checkin).toISOString().slice(0, 10)
+    const todayDate = new Date().toISOString().slice(0, 10)
+    return checkinDate > todayDate
+  }
+
+  const cancelReservation = async reservation => {
+    const reservationId = reservation._id
+    if (!canCancel(reservation)) {
+      window.alert('This reservation cannot be cancelled on the day of the reservation.')
+      return
+    }
+    if (!window.confirm('Cancel this reservation?')) return
+
+    try {
+      if (String(reservationId).startsWith('local-')) {
+        removeLocalReservation(user, reservationId)
+      } else {
+        await apiDeleteReservation(reservationId)
+        setReservations(current => current.filter(item => item._id !== reservationId))
+      }
+      window.alert('Your reservation has been cancelled.')
+    } catch (error) {
+      window.alert(error.message || 'Could not cancel this reservation. Please try again.')
+    }
   }
 
   return (
@@ -163,6 +191,17 @@ export default function Navbar({
                             {r.checkin ? new Date(r.checkin).toLocaleDateString('en-ZA') : '—'} &rarr; {r.checkout ? new Date(r.checkout).toLocaleDateString('en-ZA') : '—'}
                           </p>
                           <p style={{ color:'var(--gold)', marginTop:'.1rem' }}>R{Number(r.total||0).toLocaleString('en-ZA')}</p>
+                          {r.status !== 'cancelled' && (
+                            <button
+                              type="button"
+                              className="dropdown-item"
+                              style={{ color: canCancel(r) ? 'var(--sunset)' : 'var(--text-dim)', padding:'.45rem 0 0', cursor: canCancel(r) ? 'pointer' : 'not-allowed' }}
+                              onClick={() => cancelReservation(r)}
+                              title={canCancel(r) ? 'Cancel reservation' : 'Reservations cannot be cancelled on the check-in date'}
+                            >
+                              {canCancel(r) ? 'Cancel reservation' : 'Cannot cancel on check-in day'}
+                            </button>
+                          )}
                         </div>
                       ))
                     )}

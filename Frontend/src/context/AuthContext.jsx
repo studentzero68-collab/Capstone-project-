@@ -146,11 +146,13 @@ export function AuthProvider({ children }) {
       }
       return { ok: false, error: friendlyError({ message: data.message }) }
     } catch (err) {
-      const isNetworkError = (err?.message || '').toLowerCase().includes('failed to fetch') ||
-                             (err?.message || '').toLowerCase().includes('load failed') ||
-                             (err?.message || '').toLowerCase().includes('networkerror')
+      const errorMessage = (err?.message || '').toLowerCase()
+      const isUnavailable = errorMessage.includes('failed to fetch') ||
+                errorMessage.includes('load failed') ||
+                errorMessage.includes('networkerror') ||
+                err?.status >= 500
 
-      if (isNetworkError) {
+      if (isUnavailable) {
         // Backend offline — save locally so they can use the app right now
         const userData = {
           id:    `local_${Date.now()}`,
