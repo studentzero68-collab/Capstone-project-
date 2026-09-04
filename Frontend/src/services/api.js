@@ -1,17 +1,18 @@
 /**
  * api.js — Central API service layer
- * All calls to the Node/Express backend go through here.
- * Base URL: http://localhost:5000/api
+ *
+ * BASE URL resolution:
+ *  - In production (Render): uses VITE_API_URL env variable
+ *    → set this to your Render backend URL e.g. https://zero-api.onrender.com/api
+ *  - In local dev: falls back to http://localhost:5000/api
  */
 
-const BASE = 'http://localhost:5000/api'
+const BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
 
 // ── Helpers ──────────────────────────────────────────────────────
 
-/** Get stored JWT token */
 const getToken = () => localStorage.getItem('zero_token')
 
-/** Default headers with optional auth */
 const headers = (auth = false, json = true) => {
   const h = {}
   if (json) h['Content-Type'] = 'application/json'
@@ -22,7 +23,6 @@ const headers = (auth = false, json = true) => {
   return h
 }
 
-/** Throw readable error from response */
 const handleResponse = async (res) => {
   const data = await res.json().catch(() => ({}))
   if (!res.ok) throw new Error(data.message || `HTTP ${res.status}`)
@@ -77,10 +77,9 @@ export const apiGetAccommodation = async (id) => {
 }
 
 export const apiCreateAccommodation = async (formData) => {
-  // formData is a FormData object (supports file uploads)
   const res = await fetch(`${BASE}/accommodations`, {
     method:  'POST',
-    headers: { Authorization: `Bearer ${getToken()}` }, // no Content-Type — browser sets multipart
+    headers: { Authorization: `Bearer ${getToken()}` },
     body:    formData,
   })
   return handleResponse(res)
@@ -137,18 +136,21 @@ export const apiDeleteReservation = async (id) => {
   return handleResponse(res)
 }
 
-const localReservationsKey = (user) => `zero_reservations_${user?.id || user?.email || 'guest'}`
+// ── Local reservation fallback (offline mode) ────────────────────
+
+const localKey = (user) =>
+  `zero_reservations_${user?.id || user?.email || 'guest'}`
 
 export const getLocalReservations = (user) => {
   try {
-    return JSON.parse(localStorage.getItem(localReservationsKey(user)) || '[]')
+    return JSON.parse(localStorage.getItem(localKey(user)) || '[]')
   } catch {
     return []
   }
 }
 
 export const saveLocalReservation = (user, reservation) => {
-  const reservations = [reservation, ...getLocalReservations(user)]
-  localStorage.setItem(localReservationsKey(user), JSON.stringify(reservations))
+  const existing = getLocalReservations(user)
+  localStorage.setItem(localKey(user), JSON.stringify([reservation, ...existing]))
   window.dispatchEvent(new CustomEvent('zero:reservation-created'))
 }
