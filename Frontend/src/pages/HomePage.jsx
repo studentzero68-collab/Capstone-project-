@@ -226,10 +226,11 @@ export default function HomePage({
               aria-label={`Explore ${dest.city}`}
             >
               <img src={dest.img} alt={dest.city} loading="lazy" />
+              <div className="inspiration-card-overlay" aria-hidden="true" />
               <div className="inspiration-card-body">
+                <p className="inspiration-type">{dest.type}</p>
                 <p className="inspiration-city">{dest.city}</p>
                 <p className="inspiration-country">{dest.country}</p>
-                <p className="inspiration-type">{dest.type}</p>
               </div>
             </button>
           ))}
