@@ -28,9 +28,9 @@ export default function Navbar({
   }, [user])
 
   const loadReservations = async () => {
-    if (!user) return
     const localReservations = getLocalReservations(user)
     setReservations(localReservations)
+    if (!user) return
     setResLoading(true)
     try {
       const data = await apiGetMyReservations()
@@ -162,6 +162,31 @@ export default function Navbar({
           </button>
 
           {/* Login / user button */}
+          {!user && (
+            <div style={{ position:'relative' }}>
+              <button className="btn-host" onClick={() => { setResOpen(o => !o); if (!resOpen) loadReservations() }}>
+                My Trips {reservations.length > 0 ? `(${reservations.length})` : ''}
+              </button>
+              {resOpen && (
+                <div className="nav-dropdown" style={{ minWidth:300, right:0, top:'calc(100% + 8px)', position:'absolute', zIndex:400 }} role="dialog" aria-label="My reservations">
+                  <div style={{ padding:'.75rem 1.1rem', borderBottom:'1px solid var(--border-color)' }}>
+                    <p style={{ fontFamily:'var(--font-heading)', fontStyle:'italic', fontSize:'1.1rem', color:'var(--text-main)' }}>My Reservations</p>
+                  </div>
+                  {reservations.length === 0 ? (
+                    <p style={{ padding:'1rem', color:'var(--text-dim)', fontSize:'.9rem' }}>No reservations yet.</p>
+                  ) : reservations.map((r, i) => (
+                    <div key={r._id || i} style={{ padding:'.65rem 1.1rem', borderBottom:'1px solid var(--border-color)', fontSize:'.88rem' }}>
+                      <p style={{ fontWeight:600, color:'var(--text-main)' }}>{r.accommodation?.title || 'Stay'}</p>
+                      <p style={{ color:'var(--text-dim)', marginTop:'.1rem' }}>{new Date(r.checkin).toLocaleDateString('en-ZA')} &rarr; {new Date(r.checkout).toLocaleDateString('en-ZA')}</p>
+                      <p style={{ color:'var(--gold)', marginTop:'.1rem' }}>R{Number(r.total || 0).toLocaleString('en-ZA')}</p>
+                      {r.offline && <p style={{ color:'var(--text-dim)', marginTop:'.25rem', fontSize:'.78rem' }}>Saved offline and waiting to sync</p>}
+                    </div>
+                  ))}
+                  <div style={{ padding:'.5rem .75rem' }}><button className="dropdown-item" style={{ textAlign:'center', width:'100%' }} onClick={() => setResOpen(false)}>Close</button></div>
+                </div>
+              )}
+            </div>
+          )}
           {user ? (
             <div style={{ display:'flex', alignItems:'center', gap:'.6rem', position:'relative' }}>
               {/* Reservations dropdown */}

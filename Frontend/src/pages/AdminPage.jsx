@@ -14,6 +14,7 @@ import {
   apiGetAllReservations,
   apiGetHostReservations,
   apiDeleteReservation,
+  getOfflineReservations,
 } from '../services/api'
 import { LISTINGS } from '../data/listings'
 
@@ -92,7 +93,13 @@ export default function AdminPage({ theme, toggleTheme }) {
       const data = user?.backendRole === 'host'
         ? await apiGetHostReservations()
         : await apiGetAllReservations()
-      const nextReservations = data.reservations || []
+      const offlineReservations = getOfflineReservations()
+      const remoteReservations = data.reservations || []
+      const remoteIds = new Set(remoteReservations.map(reservation => reservation._id))
+      const nextReservations = [
+        ...remoteReservations,
+        ...offlineReservations.filter(reservation => !remoteIds.has(reservation._id)),
+      ]
       const nextIds = new Set(nextReservations.map(reservation => reservation._id))
       const hasNewReservation = knownReservationIds.current
         ? nextReservations.some(reservation => !knownReservationIds.current.has(reservation._id))
@@ -106,7 +113,10 @@ export default function AdminPage({ theme, toggleTheme }) {
       }
       knownReservationIds.current = nextIds
       setReservations(nextReservations)
-    } catch { /* keep mock */ }
+    } catch {
+      const offlineReservations = getOfflineReservations()
+      if (offlineReservations.length) setReservations(offlineReservations)
+    }
     finally { setResLoading(false) }
   }
 

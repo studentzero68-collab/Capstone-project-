@@ -145,10 +145,14 @@ export const apiDeleteReservation = async (id) => {
 
 const localKey = (user) =>
   `zero_reservations_${user?.id || user?.email || 'guest'}`
+const OFFLINE_RESERVATIONS_KEY = 'zero_offline_reservations'
 
 export const getLocalReservations = (user) => {
   try {
-    return JSON.parse(localStorage.getItem(localKey(user)) || '[]')
+    const personal = JSON.parse(localStorage.getItem(localKey(user)) || '[]')
+    const shared = JSON.parse(localStorage.getItem(OFFLINE_RESERVATIONS_KEY) || '[]')
+    const seen = new Set(personal.map(reservation => reservation._id))
+    return [...personal, ...shared.filter(reservation => !seen.has(reservation._id))]
   } catch {
     return []
   }
@@ -157,7 +161,31 @@ export const getLocalReservations = (user) => {
 export const saveLocalReservation = (user, reservation) => {
   const existing = getLocalReservations(user)
   localStorage.setItem(localKey(user), JSON.stringify([reservation, ...existing]))
+  const shared = JSON.parse(localStorage.getItem(OFFLINE_RESERVATIONS_KEY) || '[]')
+  localStorage.setItem(OFFLINE_RESERVATIONS_KEY, JSON.stringify([reservation, ...shared]))
   window.dispatchEvent(new CustomEvent('zero:reservation-created'))
+}
+
+export const getOfflineReservations = () => {
+  try { return JSON.parse(localStorage.getItem(OFFLINE_RESERVATIONS_KEY) || '[]') }
+  catch { return [] }
+}
+
+export const syncOfflineReservations = async () => {
+  const pending = getOfflineReservations()
+  const syncedIds = []
+  for (const reservation of pending) {
+    try {
+      await apiCreateReservation(reservation.payload)
+      syncedIds.push(reservation._id)
+    } catch { /* Keep queued until the API and listing are available. */ }
+  }
+  if (syncedIds.length) {
+    localStorage.setItem(OFFLINE_RESERVATIONS_KEY, JSON.stringify(
+      pending.filter(reservation => !syncedIds.includes(reservation._id))
+    ))
+    window.dispatchEvent(new CustomEvent('zero:reservation-created'))
+  }
 }
 
 export const removeLocalReservation = (user, reservationId) => {
@@ -165,5 +193,8 @@ export const removeLocalReservation = (user, reservationId) => {
     reservation => reservation._id !== reservationId
   )
   localStorage.setItem(localKey(user), JSON.stringify(remaining))
+  localStorage.setItem(OFFLINE_RESERVATIONS_KEY, JSON.stringify(
+    getOfflineReservations().filter(reservation => reservation._id !== reservationId)
+  ))
   window.dispatchEvent(new CustomEvent('zero:reservation-created'))
 }

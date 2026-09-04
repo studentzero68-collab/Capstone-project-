@@ -1,5 +1,5 @@
 import { createContext, useContext, useState } from 'react'
-import { apiLogin, apiRegister, apiLogout } from '../services/api'
+import { apiLogin, apiRegister, apiLogout, syncOfflineReservations } from '../services/api'
 
 const AuthContext = createContext(null)
 
@@ -107,6 +107,7 @@ export function AuthProvider({ children }) {
           backendRole: data.user.role,
         }
         persistUser(userData)
+        await syncOfflineReservations()
         return { ok: true, user: userData }
       }
       return { ok: false, error: data.message || 'Login failed.' }
@@ -142,6 +143,7 @@ export function AuthProvider({ children }) {
         // Also save locally so login works even if backend goes offline later
         saveLocalUser(userData, password)
         persistUser(userData)
+        await syncOfflineReservations()
         return { ok: true, user: userData }
       }
       return { ok: false, error: friendlyError({ message: data.message }) }

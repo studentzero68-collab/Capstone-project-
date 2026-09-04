@@ -166,10 +166,6 @@ export default function DetailPage({ wishlist, toggleWishlist }) {
       setResError('Please select valid check-in and check-out dates.')
       return
     }
-    if (!user) {
-      navigate('/login')
-      return
-    }
     setResLoading(true)
     try {
       // POST to MongoDB backend
@@ -189,10 +185,11 @@ export default function DetailPage({ wishlist, toggleWishlist }) {
       window.alert('Reservation confirmed. Please note: reservations cannot be cancelled on the day of the reservation.')
       navigate('/search')
     } catch {
-      // Backend offline — save to localStorage so Navbar "My Trips" still works
+      // Queue the booking locally so it remains visible and can sync later.
+      const offlineId = `local-${Date.now()}`
       saveLocalReservation(user, {
-        _id:           `local-${Date.now()}`,
-        user:          { username: user.name, email: user.email },
+        _id:           offlineId,
+        user:          user ? { username: user.name, email: user.email } : { username: 'Guest' },
         accommodation: {
           title:    listing.title,
           location: listing.location,
@@ -203,6 +200,12 @@ export default function DetailPage({ wishlist, toggleWishlist }) {
         guests: bookGuests,
         total,
         status: 'confirmed',
+        offline: true,
+        payload: {
+          accommodationId: listing.mongoId || String(listing.id),
+          checkin, checkout, guests: bookGuests, basePrice, weeklyDiscount,
+          cleaningFee, serviceFee, occupancyTaxes: taxes, total,
+        },
       })
       setReserved(true)
       window.alert('Reservation saved. Please note: reservations cannot be cancelled on the day of the reservation.')
