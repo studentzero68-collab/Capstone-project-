@@ -1272,6 +1272,83 @@ input, select { font-family: var(--font-body); }
 }
 .login-back-home:hover { color: var(--text-main); }
 
+/* ── Mode tabs (Sign in / Create account) ── */
+.login-mode-tabs {
+  display: flex;
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: .2rem;
+  margin-bottom: 1.5rem;
+  gap: .2rem;
+}
+.login-mode-tab {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--text-dim);
+  padding: .65rem 1rem;
+  border-radius: calc(var(--radius-md) - 3px);
+  font-family: var(--font-body);
+  font-size: .92rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.login-mode-tab.active {
+  background: var(--gradient-sunset);
+  color: #fff;
+  box-shadow: 0 2px 12px rgba(230,126,34,.3);
+}
+.login-mode-tab:not(.active):hover { color: var(--text-main); }
+
+/* ── Per-field validation errors ── */
+.login-field-error {
+  color: #e55;
+  font-size: .78rem;
+  margin-top: .3rem;
+}
+.login-field input[aria-invalid="true"] {
+  border-color: #e55 !important;
+  box-shadow: 0 0 0 2px rgba(229,85,85,.12);
+}
+
+/* ── Password strength bar ── */
+.pwd-strength {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  margin-top: .4rem;
+}
+.pwd-strength-bar {
+  height: 4px;
+  border-radius: 2px;
+  transition: width .3s ease, background .3s ease;
+  flex-shrink: 0;
+}
+.pwd-strength-bar.weak   { background: #e55; }
+.pwd-strength-bar.medium { background: var(--orange); }
+.pwd-strength-bar.strong { background: var(--green); }
+.pwd-strength-label {
+  font-size: .72rem;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+
+/* ── Success message ── */
+.login-success {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  background: rgba(39,174,96,.1);
+  border: 1px solid rgba(39,174,96,.3);
+  border-radius: var(--radius-sm);
+  color: var(--green);
+  font-size: .9rem;
+  padding: .75rem 1rem;
+  margin-bottom: 1rem;
+}
+
 /* ── Responsive ── */
 @media (max-width: 768px) {
   .login-page { grid-template-columns: 1fr; }
