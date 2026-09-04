@@ -1,0 +1,10 @@
+{
+  "name": "zero-airbnb",
+  "private": true,
+  "scripts": {
+    "dev": "npm run dev --prefix Frontend",
+    "dev:backend": "npm run dev --prefix Backend",
+    "build": "npm run build --prefix Frontend",
+    "preview": "npm run preview --prefix Frontend"
+  }
+}
