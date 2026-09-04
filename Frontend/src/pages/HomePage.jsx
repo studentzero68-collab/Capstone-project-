@@ -17,10 +17,28 @@
  */
 import { useState, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { LISTINGS, JOURNEY_CARDS } from '../data/listings'
+import { LISTINGS as STATIC_LISTINGS, JOURNEY_CARDS } from '../data/listings'
+import { apiGetAccommodations } from '../services/api'
 import ListingCard from '../components/ListingCard'
 import FilterPanel from '../components/FilterPanel'
 import AnimationOverlay from '../components/AnimationOverlay'
+
+// ── Normalise a MongoDB accommodation doc to match the UI shape ──
+// MongoDB docs use 'type' and 'bedrooms/bathrooms'; static data uses
+// 'category' and 'beds/baths'. This merges both so cards render correctly.
+const normalise = (doc) => ({
+  ...doc,
+  id:       doc._id || doc.id,
+  category: doc.type || doc.category,
+  culture:  ['japanese','korean','southafrican'].includes(doc.type) ? doc.type : null,
+  beds:     doc.bedrooms  ?? doc.beds  ?? 1,
+  baths:    doc.bathrooms ?? doc.baths ?? 1,
+  badge:    doc.badge || (doc.type ? doc.type.charAt(0).toUpperCase() + doc.type.slice(1) : 'Stay'),
+  img:      (doc.images && doc.images[0]) || doc.img || '',
+  photos:   doc.images?.length > 0 ? doc.images : [doc.img || ''],
+  hostInitial: doc.host?.username?.charAt(0) || doc.hostInitial || 'H',
+  host:     doc.host?.username || doc.host || 'Host',
+})
 
 // ── Static inspiration destinations ─────────────────────────────
 const INSPIRATION_TRIPS = [
@@ -85,6 +103,23 @@ export default function HomePage({
   handleSearch,
 }) {
   const navigate        = useNavigate()
+
+  // ── Live listings from MongoDB (falls back to static file) ──
+  const [allListings, setAllListings]   = useState(STATIC_LISTINGS)
+  const [listLoading, setListLoading]   = useState(true)
+
+  useEffect(() => {
+    apiGetAccommodations()
+      .then(data => {
+        if (data.accommodations && data.accommodations.length > 0) {
+          // Normalise MongoDB docs to match the shape the UI expects
+          setAllListings(data.accommodations.map(normalise))
+        }
+      })
+      .catch(() => { /* backend offline — keep static fallback */ })
+      .finally(() => setListLoading(false))
+  }, [])
+
   const [activeCulture, setActiveCulture]   = useState('all')
   const [shown, setShown]                   = useState(8)
   const [animation, setAnimation]           = useState(null)
@@ -104,16 +139,16 @@ export default function HomePage({
   })
 
   const getFiltered = useCallback(() =>
-    LISTINGS.filter(l => {
-      const catMatch   = activeCategory === 'all' || l.category === activeCategory
+    allListings.filter(l => {
+      const catMatch   = activeCategory === 'all' || (l.category || l.type) === activeCategory
       const priceMatch = l.price >= filters.priceMin && l.price <= filters.priceMax
-      const bedsMatch  = filters.beds === 0 || l.beds >= filters.beds
-      const typesMatch = filters.types.length === 0 || filters.types.includes(l.category)
+      const bedsMatch  = filters.beds === 0 || (l.beds || l.bedrooms || 0) >= filters.beds
+      const typesMatch = filters.types.length === 0 || filters.types.includes(l.category || l.type)
       const amenMatch  = filters.amenities.length === 0 ||
         filters.amenities.every(a => l.amenities.map(x=>x.toLowerCase()).some(x=>x.includes(a)))
       return catMatch && priceMatch && bedsMatch && typesMatch && amenMatch
     }),
-  [activeCategory, filters])
+  [activeCategory, filters, allListings])
 
   const getSorted = arr => {
     const c = [...arr]
@@ -125,9 +160,10 @@ export default function HomePage({
 
   const filtered  = getSorted(getFiltered())
   const displayed = filtered.slice(0, shown)
-  const cultureListings = LISTINGS.filter(l =>
-    (activeCulture==='all' && l.culture) || l.culture===activeCulture
-  )
+  const cultureListings = allListings.filter(l => {
+    const culture = l.culture || (l.type && ['japanese','korean','southafrican'].includes(l.type) ? l.type : null)
+    return (activeCulture === 'all' && culture) || culture === activeCulture
+  })
 
   const handleJourney = card => {
     setActiveJourney(card.id)
@@ -278,10 +314,14 @@ export default function HomePage({
           </select>
         </div>
         <div className="listings-grid" role="list">
-          {displayed.length===0
+          {listLoading ? (
+            <div className="spinner-wrap" style={{ gridColumn:'1/-1' }}>
+              <div className="spinner" aria-label="Loading listings" />
+            </div>
+          ) : displayed.length===0
             ? <p className="no-results">No stays match your filters. Try adjusting them.</p>
             : displayed.map(l => (
-                <ListingCard key={l.id} listing={l} wishlist={wishlist} toggleWishlist={toggleWishlist} />
+                <ListingCard key={l._id || l.id} listing={l} wishlist={wishlist} toggleWishlist={toggleWishlist} />
               ))
           }
         </div>

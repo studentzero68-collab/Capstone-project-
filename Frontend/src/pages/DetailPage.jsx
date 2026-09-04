@@ -1,27 +1,31 @@
 /**
  * DetailPage.jsx
- * Rubric sections:
+ * Data source: GET /api/accommodations/:id  (MongoDB)
+ * Fallback:    LISTINGS static array (when backend is offline)
+ *
+ * Rubric sections covered:
  *  - Accommodation type & location heading
- *  - Subheading / avg star review & location
+ *  - Subheading / avg star review
  *  - 5-photo gallery (large left, 2x2 right)
  *  - Two-column layout (details | cost calculator)
- *  - Cost calculator with dynamic date pickers + guest count
- *  - Weekly discount, cleaning fee, service fee, occupancy taxes
+ *  - Cost calculator: nightly rate × nights, weekly discount,
+ *    cleaning fee, service fee, occupancy taxes — all dynamic
  *  - Where you'll sleep (bedroom cards)
  *  - What this place offers (amenities)
- *  - Specific ratings (cleanliness, communication, check-in, accuracy, location, value)
- *  - Reviews
- *  - Host details
+ *  - Specific ratings breakdown
+ *  - Guest reviews
+ *  - Host detail card
  *  - House rules / health & safety / cancellation policy
- *  - Reservation button (posts to backend when online, local state fallback)
+ *  - Reserve button → POST /api/reservations (saves to MongoDB)
+ *    Falls back to localStorage when backend is offline
  */
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { LISTINGS } from '../data/listings'
 import { useAuth } from '../context/AuthContext'
-import { apiCreateReservation, saveLocalReservation } from '../services/api'
+import { apiGetAccommodation, apiCreateReservation, saveLocalReservation } from '../services/api'
 
-// Bedroom card images per category
+// Bedroom card images per category type
 const BEDROOM_IMGS = {
   treehouse:    'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=400&q=70',
   beach:        'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&q=70',
@@ -34,47 +38,128 @@ const BEDROOM_IMGS = {
   southafrican: 'https://images.unsplash.com/photo-1523805009345-7448845a9e53?w=400&q=70',
 }
 
-export default function DetailPage({ wishlist, toggleWishlist }) {
-  const { id }      = useParams()
-  const navigate    = useNavigate()
-  const { user }    = useAuth()
-  const listing     = LISTINGS.find(l => l.id === Number(id))
+// Normalise a MongoDB doc so the JSX below works for both sources
+const normalise = (doc) => {
+  const category = doc.type || doc.category || 'treehouse'
+  const images   = doc.images?.length > 0 ? doc.images : [doc.img || '']
+  return {
+    ...doc,
+    id:           doc._id  || doc.id,
+    mongoId:      doc._id  || null,       // keep the real _id for the reservation POST
+    category,
+    beds:         doc.bedrooms  ?? doc.beds  ?? 1,
+    baths:        doc.bathrooms ?? doc.baths ?? 1,
+    badge:        doc.badge || (category.charAt(0).toUpperCase() + category.slice(1)),
+    img:          images[0],
+    photos:       images,
+    host:         doc.host?.username || doc.host || 'Host',
+    hostInitial:  doc.host?.username?.charAt(0) || doc.hostInitial || 'H',
+    reviewsList:  doc.reviewsList || [],
+    specificRatings: doc.specificRatings || null,
+    cleaningFee:  doc.cleaningFee  ?? 350,
+    serviceFee:   doc.serviceFee   ?? 0,
+    occupancyTaxes: doc.occupancyTaxes ?? 0,
+    weeklyDiscount: doc.weeklyDiscount ?? 0,
+  }
+}
 
+export default function DetailPage({ wishlist, toggleWishlist }) {
+  const { id }   = useParams()
+  const navigate = useNavigate()
+  const { user } = useAuth()
+
+  // ── Listing state ──────────────────────────────────────────────
+  const [listing, setListing]   = useState(null)
+  const [pageLoading, setPageLoading] = useState(true)
+  const [pageError, setPageError]     = useState('')
+
+  // ── Booking state ──────────────────────────────────────────────
   const [checkin, setCheckin]       = useState('')
   const [checkout, setCheckout]     = useState('')
   const [bookGuests, setBookGuests] = useState(1)
   const [reserved, setReserved]     = useState(false)
   const [resLoading, setResLoading] = useState(false)
   const [resError, setResError]     = useState('')
+
   const today = new Date().toISOString().split('T')[0]
 
-  useEffect(() => { window.scrollTo({ top:0, behavior:'smooth' }) }, [id])
+  // ── Fetch on mount / when id changes ──────────────────────────
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+    setPageLoading(true)
+    setPageError('')
+    setReserved(false)
 
-  if (!listing) {
+    // Try MongoDB first — id could be a Mongo _id string or a numeric static id
+    apiGetAccommodation(id)
+      .then(data => {
+        if (data.accommodation) {
+          setListing(normalise(data.accommodation))
+        } else {
+          throw new Error('No accommodation in response')
+        }
+      })
+      .catch(() => {
+        // Backend offline or id is a numeric static id — fall back to static file
+        const staticMatch = LISTINGS.find(
+          l => String(l.id) === String(id) || l._id === id
+        )
+        if (staticMatch) {
+          setListing(normalise(staticMatch))
+        } else {
+          setPageError('Listing not found.')
+        }
+      })
+      .finally(() => setPageLoading(false))
+  }, [id])
+
+  // ── Loading state ──────────────────────────────────────────────
+  if (pageLoading) {
     return (
-      <main style={{ padding:'4rem 1.5rem', textAlign:'center' }}>
-        <h2 style={{ fontFamily:'var(--font-heading)', fontStyle:'italic', marginBottom:'1rem' }}>Listing not found</h2>
+      <main style={{ display: 'flex', justifyContent: 'center', padding: '6rem 1.5rem' }}>
+        <div className="spinner" aria-label="Loading listing" />
+      </main>
+    )
+  }
+
+  // ── Error / not found ──────────────────────────────────────────
+  if (pageError || !listing) {
+    return (
+      <main style={{ padding: '4rem 1.5rem', textAlign: 'center' }}>
+        <h2 style={{ fontFamily: 'var(--font-heading)', fontStyle: 'italic', marginBottom: '1rem' }}>
+          {pageError || 'Listing not found'}
+        </h2>
         <button className="btn-hero" onClick={() => navigate('/')}>Back to home</button>
       </main>
     )
   }
 
-  const isLiked = wishlist.includes(listing.id)
-  const fmt     = n => `R${Number(n||0).toLocaleString('en-ZA')}`
+  // ── Derived values ─────────────────────────────────────────────
+  const isLiked = wishlist.includes(listing.id) || wishlist.includes(listing._id)
+  const fmt     = n => `R${Number(n || 0).toLocaleString('en-ZA')}`
 
-  // Cost calculator
   const nights = (() => {
     if (!checkin || !checkout) return 0
     const diff = Math.round((new Date(checkout) - new Date(checkin)) / 86400000)
     return diff > 0 ? diff : 0
   })()
+
   const basePrice      = listing.price * nights
-  const weeklyDiscount = nights >= 7 ? Math.round(basePrice * 0.10) : 0
-  const cleaningFee    = 350
-  const serviceFee     = Math.round((basePrice - weeklyDiscount) * 0.12)
-  const taxes          = Math.round((basePrice - weeklyDiscount + cleaningFee + serviceFee) * 0.15)
+  // Use the listing's own weekly discount % if available, else default 10%
+  const wkDiscPct      = listing.weeklyDiscount > 1
+    ? listing.weeklyDiscount / 100   // e.g. 10 → 0.10
+    : listing.weeklyDiscount          // e.g. 0.10 already
+  const weeklyDiscount = nights >= 7 ? Math.round(basePrice * (wkDiscPct || 0.10)) : 0
+  const cleaningFee    = listing.cleaningFee || 350
+  const serviceFee     = listing.serviceFee
+    ? listing.serviceFee
+    : Math.round((basePrice - weeklyDiscount) * 0.12)
+  const taxes          = listing.occupancyTaxes
+    ? listing.occupancyTaxes
+    : Math.round((basePrice - weeklyDiscount + cleaningFee + serviceFee) * 0.15)
   const total          = basePrice - weeklyDiscount + cleaningFee + serviceFee + taxes
 
+  // ── Reserve handler ────────────────────────────────────────────
   const handleReserve = async () => {
     setResError('')
     if (!checkin || !checkout || nights <= 0) {
@@ -87,27 +172,32 @@ export default function DetailPage({ wishlist, toggleWishlist }) {
     }
     setResLoading(true)
     try {
+      // POST to MongoDB backend
       await apiCreateReservation({
-        accommodationId: String(listing.id),
+        accommodationId: listing.mongoId || String(listing.id),
         checkin, checkout,
-        guests: bookGuests,
-        basePrice, weeklyDiscount, cleaningFee, serviceFee,
-        occupancyTaxes: taxes, total,
+        guests:         bookGuests,
+        basePrice,
+        weeklyDiscount,
+        cleaningFee,
+        serviceFee,
+        occupancyTaxes: taxes,
+        total,
       })
       setReserved(true)
       window.dispatchEvent(new CustomEvent('zero:reservation-created'))
     } catch {
+      // Backend offline — save to localStorage so Navbar "My Trips" still works
       saveLocalReservation(user, {
-        _id: `local-${Date.now()}`,
-        user: { username: user.name, email: user.email },
+        _id:           `local-${Date.now()}`,
+        user:          { username: user.name, email: user.email },
         accommodation: {
-          title: listing.title,
+          title:    listing.title,
           location: listing.location,
-          price: listing.price,
-          images: listing.images || listing.photos,
+          price:    listing.price,
+          images:   listing.photos,
         },
-        checkin,
-        checkout,
+        checkin, checkout,
         guests: bookGuests,
         total,
         status: 'confirmed',
@@ -118,68 +208,78 @@ export default function DetailPage({ wishlist, toggleWishlist }) {
     }
   }
 
-  // Specific ratings (use listing values or sensible defaults)
-  const specificRatings = listing.specificRatings || {
-    cleanliness:   (listing.rating - 0.05).toFixed(1),
-    communication: (listing.rating + 0.02).toFixed(1),
-    checkIn:       (listing.rating + 0.05).toFixed(1),
-    accuracy:      (listing.rating - 0.02).toFixed(1),
-    location:      (listing.rating + 0.08).toFixed(1),
-    value:         (listing.rating - 0.08).toFixed(1),
-  }
+  // ── Specific ratings ───────────────────────────────────────────
+  const specificRatings = listing.specificRatings && Object.values(listing.specificRatings).some(v => v > 0)
+    ? listing.specificRatings
+    : {
+        cleanliness:   Number((listing.rating - 0.05).toFixed(1)),
+        communication: Number((listing.rating + 0.02).toFixed(1)),
+        checkIn:       Number((listing.rating + 0.05).toFixed(1)),
+        accuracy:      Number((listing.rating - 0.02).toFixed(1)),
+        location:      Number((listing.rating + 0.08).toFixed(1)),
+        value:         Number((listing.rating - 0.08).toFixed(1)),
+      }
 
   const bedroomImg = BEDROOM_IMGS[listing.category] || BEDROOM_IMGS.treehouse
+  const bedCount   = listing.beds || listing.bedrooms || 1
 
   return (
     <main id="main-content">
       <div className="detail-layout">
 
-        {/* Back */}
+        {/* ── Back button ── */}
         <nav aria-label="Breadcrumb">
           <button className="btn-back" onClick={() => navigate(-1)} aria-label="Go back">
             &larr; Back
           </button>
         </nav>
 
-        {/* ── Heading ── */}
-        <h1 className="detail-title" style={{ marginBottom:'.2rem' }}>{listing.title}</h1>
-        <div style={{ display:'flex', alignItems:'center', gap:'1rem', flexWrap:'wrap', marginBottom:'1.25rem' }}>
-          <span style={{ fontFamily:'var(--font-accent)', color:'var(--gold)' }}>
+        {/* ── Heading + subheading ── */}
+        <h1 className="detail-title" style={{ marginBottom: '.2rem' }}>{listing.title}</h1>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap', marginBottom: '1.25rem' }}>
+          <span style={{ fontFamily: 'var(--font-accent)', color: 'var(--gold)' }}>
             * {listing.rating}
           </span>
-          <span style={{ color:'var(--text-dim)' }}>·</span>
-          <a href="#reviews-heading" style={{ color:'var(--text-dim)', fontFamily:'var(--font-accent)', fontSize:'.92rem' }}>
+          <span style={{ color: 'var(--text-dim)' }}>·</span>
+          <a href="#reviews-heading"
+            style={{ color: 'var(--text-dim)', fontFamily: 'var(--font-accent)', fontSize: '.92rem' }}>
             {listing.reviews} reviews
           </a>
-          <span style={{ color:'var(--text-dim)' }}>·</span>
-          <span style={{ fontFamily:'var(--font-accent)', color:'var(--blue-light)', fontSize:'.92rem' }}>
+          <span style={{ color: 'var(--text-dim)' }}>·</span>
+          <span style={{ fontFamily: 'var(--font-accent)', color: 'var(--blue-light)', fontSize: '.92rem' }}>
             {listing.location}
           </span>
         </div>
 
-        {/* ── 5-Photo gallery ── */}
+        {/* ── 5-photo gallery ── */}
         <div className="detail-photos" role="img" aria-label={`Photos of ${listing.title}`}>
-          {listing.photos.slice(0,5).map((src,i) => (
-            <img key={i} src={src} alt={`${listing.title} — photo ${i+1}`} loading={i===0?'eager':'lazy'} />
+          {listing.photos.slice(0, 5).map((src, i) => (
+            <img
+              key={i}
+              src={src}
+              alt={`${listing.title} — photo ${i + 1}`}
+              loading={i === 0 ? 'eager' : 'lazy'}
+            />
           ))}
         </div>
 
-        {/* ── 2-col layout ── */}
+        {/* ── Two-column layout ── */}
         <div className="detail-main">
 
-          {/* ── INFO COLUMN ── */}
+          {/* ══════════════ INFO COLUMN ══════════════ */}
           <div className="detail-info-col">
+
             <span className="detail-badge">{listing.badge}</span>
 
-            <div className="detail-meta-row" style={{ marginTop:'.5rem' }}>
+            <div className="detail-meta-row" style={{ marginTop: '.5rem' }}>
               <span>{listing.guests} guests</span>
-              <span>{listing.beds} bedroom{listing.beds>1?'s':''}</span>
-              <span>{listing.baths} bath{listing.baths>1?'s':''}</span>
+              <span>{bedCount} bedroom{bedCount > 1 ? 's' : ''}</span>
+              <span>{listing.baths} bath{listing.baths > 1 ? 's' : ''}</span>
             </div>
 
             <hr className="detail-divider" />
 
-            {/* ── HOST DETAILS ── */}
+            {/* Host summary */}
             <div className="detail-host">
               <div className="host-avatar" aria-hidden="true">{listing.hostInitial}</div>
               <div>
@@ -190,22 +290,22 @@ export default function DetailPage({ wishlist, toggleWishlist }) {
 
             <hr className="detail-divider" />
 
-            {/* ── ABOUT ── */}
+            {/* About */}
             <h2 className="detail-sub-heading">About this space</h2>
             <p className="detail-description">{listing.description}</p>
 
             <hr className="detail-divider" />
 
-            {/* ── WHERE YOU'LL SLEEP ── */}
+            {/* Where you'll sleep */}
             <h2 className="detail-sub-heading">Where you'll sleep</h2>
             <div className="sleep-grid">
-              {Array.from({ length: listing.beds }).map((_, i) => (
+              {Array.from({ length: bedCount }).map((_, i) => (
                 <div key={i} className="sleep-card">
-                  <img src={bedroomImg} alt={`Bedroom ${i+1}`} loading="lazy" />
+                  <img src={bedroomImg} alt={`Bedroom ${i + 1}`} loading="lazy" />
                   <div className="sleep-card-body">
-                    <p className="sleep-room">Bedroom {i+1}</p>
+                    <p className="sleep-room">Bedroom {i + 1}</p>
                     <p className="sleep-desc">
-                      {i===0 ? '1 queen bed' : i===1 ? '2 single beds' : '1 king bed'}
+                      {i === 0 ? '1 queen bed' : i === 1 ? '2 single beds' : '1 king bed'}
                     </p>
                   </div>
                 </div>
@@ -214,13 +314,13 @@ export default function DetailPage({ wishlist, toggleWishlist }) {
 
             <hr className="detail-divider" />
 
-            {/* ── AMENITIES ── */}
+            {/* Amenities */}
             <h2 className="detail-sub-heading">What this place offers</h2>
             <ul className="amenities-list" aria-label="Amenities">
               {listing.amenities.map(a => (
                 <li key={a}>
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="var(--green)" aria-hidden="true">
-                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
                   </svg>
                   {a}
                 </li>
@@ -229,165 +329,272 @@ export default function DetailPage({ wishlist, toggleWishlist }) {
 
             <hr className="detail-divider" />
 
-            {/* ── NIGHTS HEADING (per rubric: "7 nights in [location]") ── */}
+            {/* N nights in [location] — rubric requirement */}
             {nights > 0 && (
               <>
-                <h2 className="detail-sub-heading">{nights} night{nights!==1?'s':''} in {listing.location.split(',')[0]}</h2>
-                <div className="booking-price-breakdown" style={{ border:'none', paddingTop:0 }}>
-                  <div className="breakdown-row"><span>{fmt(listing.price)} x {nights} night{nights!==1?'s':''}</span><span>{fmt(basePrice)}</span></div>
-                  {weeklyDiscount>0 && <div className="breakdown-row" style={{ color:'var(--green)' }}><span>Weekly discount (10%)</span><span>-{fmt(weeklyDiscount)}</span></div>}
-                  <div className="breakdown-row"><span>Cleaning fee</span><span>{fmt(cleaningFee)}</span></div>
-                  <div className="breakdown-row"><span>Service fee (12%)</span><span>{fmt(serviceFee)}</span></div>
-                  <div className="breakdown-row"><span>Occupancy taxes (15%)</span><span>{fmt(taxes)}</span></div>
-                  <div className="breakdown-row total"><span>Total</span><span>{fmt(total)}</span></div>
+                <h2 className="detail-sub-heading">
+                  {nights} night{nights !== 1 ? 's' : ''} in {listing.location.split(',')[0]}
+                </h2>
+                <div className="booking-price-breakdown" style={{ border: 'none', paddingTop: 0 }}>
+                  <div className="breakdown-row">
+                    <span>{fmt(listing.price)} x {nights} night{nights !== 1 ? 's' : ''}</span>
+                    <span>{fmt(basePrice)}</span>
+                  </div>
+                  {weeklyDiscount > 0 && (
+                    <div className="breakdown-row" style={{ color: 'var(--green)' }}>
+                      <span>Weekly discount</span>
+                      <span>-{fmt(weeklyDiscount)}</span>
+                    </div>
+                  )}
+                  <div className="breakdown-row">
+                    <span>Cleaning fee</span><span>{fmt(cleaningFee)}</span>
+                  </div>
+                  <div className="breakdown-row">
+                    <span>Service fee</span><span>{fmt(serviceFee)}</span>
+                  </div>
+                  <div className="breakdown-row">
+                    <span>Occupancy taxes</span><span>{fmt(taxes)}</span>
+                  </div>
+                  <div className="breakdown-row total">
+                    <span>Total</span><span>{fmt(total)}</span>
+                  </div>
                 </div>
                 <hr className="detail-divider" />
               </>
             )}
 
-            {/* ── SPECIFIC RATINGS ── */}
-            <h2 className="detail-sub-heading" id="reviews-heading">* {listing.rating} · {listing.reviews} reviews</h2>
+            {/* Specific ratings */}
+            <h2 className="detail-sub-heading" id="reviews-heading">
+              * {listing.rating} · {listing.reviews} reviews
+            </h2>
             <div className="specific-ratings-grid">
               {Object.entries(specificRatings).map(([key, val]) => (
                 <div key={key} className="specific-rating-row">
-                  <span className="specific-rating-label">{key.charAt(0).toUpperCase()+key.slice(1)}</span>
+                  <span className="specific-rating-label">
+                    {key.charAt(0).toUpperCase() + key.slice(1)}
+                  </span>
                   <div className="specific-rating-bar">
-                    <div className="specific-rating-fill" style={{ width:`${(Number(val)/5)*100}%` }} />
+                    <div
+                      className="specific-rating-fill"
+                      style={{ width: `${(Number(val) / 5) * 100}%` }}
+                    />
                   </div>
-                  <span className="specific-rating-val">{val}</span>
+                  <span className="specific-rating-val">{Number(val).toFixed(1)}</span>
                 </div>
               ))}
             </div>
 
             <hr className="detail-divider" />
 
-            {/* ── REVIEWS ── */}
-            <div className="reviews-list" aria-label="Guest reviews">
-              {listing.reviewsList.map((r,i) => (
-                <div key={i} className="review-card">
-                  <div className="review-header">
-                    <div className="review-avatar" aria-hidden="true">{r.name.charAt(0)}</div>
-                    <div>
-                      <p className="review-name">{r.name}</p>
-                      <p className="review-date">{r.date}</p>
+            {/* Guest reviews */}
+            {listing.reviewsList.length > 0 && (
+              <div className="reviews-list" aria-label="Guest reviews">
+                {listing.reviewsList.map((r, i) => (
+                  <div key={i} className="review-card">
+                    <div className="review-header">
+                      <div className="review-avatar" aria-hidden="true">
+                        {r.name?.charAt(0) || '?'}
+                      </div>
+                      <div>
+                        <p className="review-name">{r.name}</p>
+                        <p className="review-date">{r.date}</p>
+                      </div>
                     </div>
+                    <p className="review-stars" aria-label={`${r.stars} out of 5 stars`}>
+                      {'* '.repeat(r.stars).trim()}
+                    </p>
+                    <p className="review-text">"{r.text}"</p>
                   </div>
-                  <p className="review-stars" aria-label={`${r.stars} out of 5 stars`}>
-                    {'* '.repeat(r.stars).trim()}
-                  </p>
-                  <p className="review-text">"{r.text}"</p>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
 
             <hr className="detail-divider" />
 
-            {/* ── HOST DETAIL CARD ── */}
+            {/* Host detail card */}
             <h2 className="detail-sub-heading">About your host</h2>
             <div className="host-detail-card">
               <div className="host-detail-avatar">{listing.hostInitial}</div>
               <div className="host-detail-info">
                 <p className="host-detail-name">{listing.host}</p>
                 <p className="host-detail-meta">Superhost · Joined 2024</p>
-                <p className="host-detail-stats">* {listing.rating} rating · {listing.reviews} reviews · 99% response rate</p>
+                <p className="host-detail-stats">
+                  * {listing.rating} rating · {listing.reviews} reviews · 99% response rate
+                </p>
                 <p className="host-detail-bio">
-                  Passionate about creating unforgettable stays. Every detail of this space was
-                  designed with you in mind — your comfort, your freedom, your next chapter.
+                  Passionate about creating unforgettable stays. Every detail of this space
+                  was designed with you in mind — your comfort, your freedom, your next chapter.
                 </p>
               </div>
             </div>
 
             <hr className="detail-divider" />
 
-            {/* ── HOUSE RULES ── */}
+            {/* House rules */}
             <h2 className="detail-sub-heading">House rules</h2>
-            <ul style={{ display:'flex', flexDirection:'column', gap:'.6rem', color:'var(--text-dim)', fontSize:'.93rem' }}>
-              {['Check-in: after 14:00 · Check-out: before 11:00','No smoking on the premises',
-                'Pets on request only','Events allowed with prior approval',`Maximum ${listing.guests} guests`]
-                .map(r => <li key={r} style={{ display:'flex', gap:'.6rem', alignItems:'flex-start' }}><span style={{ color:'var(--border-hover)', flexShrink:0 }}>—</span>{r}</li>)}
+            <ul style={{ display: 'flex', flexDirection: 'column', gap: '.6rem', color: 'var(--text-dim)', fontSize: '.93rem' }}>
+              {[
+                'Check-in: after 14:00 · Check-out: before 11:00',
+                'No smoking on the premises',
+                'Pets on request only',
+                'Events allowed with prior approval',
+                `Maximum ${listing.guests} guests`,
+              ].map(rule => (
+                <li key={rule} style={{ display: 'flex', gap: '.6rem', alignItems: 'flex-start' }}>
+                  <span style={{ color: 'var(--border-hover)', flexShrink: 0 }}>—</span>
+                  {rule}
+                </li>
+              ))}
             </ul>
 
             <hr className="detail-divider" />
 
-            {/* ── HEALTH & SAFETY ── */}
+            {/* Health & safety */}
             <h2 className="detail-sub-heading">Health &amp; safety</h2>
-            <ul style={{ display:'flex', flexDirection:'column', gap:'.6rem', color:'var(--text-dim)', fontSize:'.93rem' }}>
-              {['Enhanced cleaning protocol between every stay','Hand sanitiser and masks provided on arrival',
-                'First aid kit on site','Carbon monoxide and smoke detectors installed']
-                .map(r => <li key={r} style={{ display:'flex', gap:'.6rem', alignItems:'flex-start' }}><span style={{ color:'var(--green)', flexShrink:0 }}>+</span>{r}</li>)}
+            <ul style={{ display: 'flex', flexDirection: 'column', gap: '.6rem', color: 'var(--text-dim)', fontSize: '.93rem' }}>
+              {[
+                'Enhanced cleaning protocol between every stay',
+                'Hand sanitiser and masks provided on arrival',
+                'First aid kit on site',
+                'Carbon monoxide and smoke detectors installed',
+              ].map(item => (
+                <li key={item} style={{ display: 'flex', gap: '.6rem', alignItems: 'flex-start' }}>
+                  <span style={{ color: 'var(--green)', flexShrink: 0 }}>+</span>
+                  {item}
+                </li>
+              ))}
             </ul>
 
             <hr className="detail-divider" />
 
-            {/* ── CANCELLATION POLICY ── */}
+            {/* Cancellation policy */}
             <h2 className="detail-sub-heading">Cancellation policy</h2>
-            <p style={{ color:'var(--text-dim)', fontSize:'.93rem', lineHeight:1.75 }}>
-              <strong style={{ color:'var(--text-main)' }}>Flexible:</strong> Full refund for
-              cancellations at least 24 hours before check-in. After that, the first night and
-              service fee are non-refundable. Cancellations within 24 hours of check-in are
-              fully non-refundable.
+            <p style={{ color: 'var(--text-dim)', fontSize: '.93rem', lineHeight: 1.75 }}>
+              <strong style={{ color: 'var(--text-main)' }}>Flexible:</strong> Full refund
+              for cancellations at least 24 hours before check-in. After that, the first night
+              and service fee are non-refundable. Cancellations within 24 hours of check-in
+              are fully non-refundable.
             </p>
           </div>
 
-          {/* ── BOOKING CARD ── */}
+          {/* ══════════════ BOOKING CARD ══════════════ */}
           <aside aria-label="Booking">
             <div className="detail-booking-card">
+
               <div className="booking-price-row">
                 <span className="booking-price">{fmt(listing.price)}</span>
                 <span className="booking-per">/ night</span>
               </div>
-              <div className="booking-rating-row">* {listing.rating} · {listing.reviews} reviews</div>
+              <div className="booking-rating-row">
+                * {listing.rating} · {listing.reviews} reviews
+              </div>
 
+              {/* Date pickers */}
               <div className="booking-dates">
                 <div className="booking-field">
                   <label htmlFor="book-ci">Check in</label>
-                  <input id="book-ci" type="date" value={checkin}
+                  <input
+                    id="book-ci"
+                    type="date"
+                    value={checkin}
                     min={today}
-                    onChange={e => setCheckin(e.target.value)} />
+                    onChange={e => { setCheckin(e.target.value); setReserved(false) }}
+                  />
                 </div>
                 <div className="booking-field">
                   <label htmlFor="book-co">Check out</label>
-                  <input id="book-co" type="date" value={checkout}
+                  <input
+                    id="book-co"
+                    type="date"
+                    value={checkout}
                     min={checkin || today}
-                    onChange={e => setCheckout(e.target.value)} />
+                    onChange={e => { setCheckout(e.target.value); setReserved(false) }}
+                  />
                 </div>
               </div>
 
+              {/* Guest stepper */}
               <div className="booking-guests-row">
                 <label>Guests</label>
                 <div className="guest-stepper">
-                  <button className="stepper-btn" disabled={bookGuests<=1}
-                    onClick={() => setBookGuests(g=>Math.max(1,g-1))} aria-label="Decrease">-</button>
+                  <button
+                    className="stepper-btn"
+                    disabled={bookGuests <= 1}
+                    onClick={() => setBookGuests(g => Math.max(1, g - 1))}
+                    aria-label="Remove guest"
+                  >
+                    -
+                  </button>
                   <span className="guest-count" aria-live="polite">{bookGuests}</span>
-                  <button className="stepper-btn" disabled={bookGuests>=listing.guests}
-                    onClick={() => setBookGuests(g=>Math.min(listing.guests,g+1))} aria-label="Increase">+</button>
+                  <button
+                    className="stepper-btn"
+                    disabled={bookGuests >= listing.guests}
+                    onClick={() => setBookGuests(g => Math.min(listing.guests, g + 1))}
+                    aria-label="Add guest"
+                  >
+                    +
+                  </button>
                 </div>
               </div>
 
+              {/* Error */}
               {resError && (
-                <p style={{ color:'#e55', fontSize:'.85rem', marginBottom:'.75rem', lineHeight:1.4 }}>{resError}</p>
+                <p style={{ color: '#e55', fontSize: '.85rem', marginBottom: '.75rem', lineHeight: 1.4 }}>
+                  {resError}
+                </p>
               )}
 
-              <button className="btn-reserve" onClick={handleReserve} disabled={resLoading || reserved}
-                aria-label={`Reserve ${listing.title}`}>
+              {/* Reserve button */}
+              <button
+                className="btn-reserve"
+                onClick={handleReserve}
+                disabled={resLoading || reserved}
+                aria-label={`Reserve ${listing.title}`}
+              >
                 {resLoading ? 'Reserving...' : reserved ? 'Reserved!' : 'Reserve'}
               </button>
               <p className="booking-notice">You won't be charged yet</p>
 
+              {/* Confirmation message */}
               {reserved && (
-                <div style={{ background:'rgba(39,174,96,.1)', border:'1px solid rgba(39,174,96,.3)', borderRadius:'var(--radius-sm)', padding:'.75rem', marginBottom:'1rem', fontSize:'.88rem', color:'var(--green)' }}>
-                  Reservation confirmed! Check your account for details.
+                <div style={{
+                  background: 'rgba(39,174,96,.1)',
+                  border: '1px solid rgba(39,174,96,.3)',
+                  borderRadius: 'var(--radius-sm)',
+                  padding: '.75rem',
+                  marginBottom: '1rem',
+                  fontSize: '.88rem',
+                  color: 'var(--green)',
+                }}>
+                  Reservation confirmed! View it under My Trips.
                 </div>
               )}
 
+              {/* Live cost breakdown */}
               {nights > 0 && (
                 <div className="booking-price-breakdown">
-                  <div className="breakdown-row"><span>{fmt(listing.price)} x {nights} night{nights!==1?'s':''}</span><span>{fmt(basePrice)}</span></div>
-                  {weeklyDiscount>0 && <div className="breakdown-row" style={{ color:'var(--green)' }}><span>Weekly discount (10%)</span><span>-{fmt(weeklyDiscount)}</span></div>}
-                  <div className="breakdown-row"><span>Cleaning fee</span><span>{fmt(cleaningFee)}</span></div>
-                  <div className="breakdown-row"><span>Service fee</span><span>{fmt(serviceFee)}</span></div>
-                  <div className="breakdown-row"><span>Occupancy taxes</span><span>{fmt(taxes)}</span></div>
-                  <div className="breakdown-row total"><span>Total</span><span>{fmt(total)}</span></div>
+                  <div className="breakdown-row">
+                    <span>{fmt(listing.price)} x {nights} night{nights !== 1 ? 's' : ''}</span>
+                    <span>{fmt(basePrice)}</span>
+                  </div>
+                  {weeklyDiscount > 0 && (
+                    <div className="breakdown-row" style={{ color: 'var(--green)' }}>
+                      <span>Weekly discount</span>
+                      <span>-{fmt(weeklyDiscount)}</span>
+                    </div>
+                  )}
+                  <div className="breakdown-row">
+                    <span>Cleaning fee</span><span>{fmt(cleaningFee)}</span>
+                  </div>
+                  <div className="breakdown-row">
+                    <span>Service fee</span><span>{fmt(serviceFee)}</span>
+                  </div>
+                  <div className="breakdown-row">
+                    <span>Occupancy taxes</span><span>{fmt(taxes)}</span>
+                  </div>
+                  <div className="breakdown-row total">
+                    <span>Total</span><span>{fmt(total)}</span>
+                  </div>
                 </div>
               )}
             </div>
