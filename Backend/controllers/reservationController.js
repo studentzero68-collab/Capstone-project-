@@ -100,6 +100,15 @@ const deleteReservation = async (req, res) => {
       return res.status(403).json({ success: false, message: 'Not authorised to cancel this reservation' })
     }
 
+    const checkinDate = reservation.checkin.toISOString().slice(0, 10)
+    const todayDate = new Date().toISOString().slice(0, 10)
+    if (!isAdmin && checkinDate <= todayDate) {
+      return res.status(400).json({
+        success: false,
+        message: 'Reservations cannot be cancelled on or after the check-in date',
+      })
+    }
+
     await reservation.deleteOne()
     res.json({ success: true, message: 'Reservation cancelled successfully' })
   } catch (err) {

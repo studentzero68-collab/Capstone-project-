@@ -20,14 +20,15 @@ const registerUser = async (req, res) => {
       return res.status(400).json({ success: false, message: 'All fields are required' })
     }
 
-    const exists = await User.findOne({ email })
+    const normalizedEmail = email.trim().toLowerCase()
+    const exists = await User.findOne({ email: normalizedEmail })
     if (exists) {
       return res.status(409).json({ success: false, message: 'Email already registered' })
     }
 
     const user = await User.create({
       username,
-      email,
+      email: normalizedEmail,
       password,
       role: role || 'user',
     })
