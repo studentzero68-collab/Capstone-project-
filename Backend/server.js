@@ -49,6 +49,13 @@ app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', message: 'Zero API is running', timestamp: new Date() })
 })
 
+// Serve the built React app when frontend and backend share one deployment.
+const frontendDist = path.join(__dirname, '..', 'Frontend', 'dist')
+app.use(express.static(frontendDist))
+app.get('*', (_req, res) => {
+  res.sendFile(path.join(frontendDist, 'index.html'))
+})
+
 // 404 handler
 app.use((_req, res) => {
   res.status(404).json({ success: false, message: 'Route not found' })
